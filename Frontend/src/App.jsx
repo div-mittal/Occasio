@@ -1,18 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Route, Routes } from "react-router-dom";
+import Temp from "./pages/Temp.jsx";
+import Hello from "./pages/Hello.jsx";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div className='flex justify-center items-center h-[100vh]'>
-        <h1 className='text-xl font-bold'>Hello is the css working</h1>
-      </div>
+      <Routes>
+        <Route path="/" element={<Temp/>} />
+        <Route path="/hello" element={<Hello/>} />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
