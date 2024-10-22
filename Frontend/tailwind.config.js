@@ -11,6 +11,9 @@ export default {
         "wht" : "#D3D3D3",
         "ylw" : "#E0AF31",
       },
+      fontFamily: {
+        roboto: ['Afacad', 'Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],

@@ -1,10 +1,11 @@
 import React from "react";
-
+import Navbar from "../components/Navbar";
 function Landing() {
     return (
         <>
-        <div className="flex justify-center items-center h-[100vh]">
-            <h1 className="text-xl font-bold">css working</h1>
+        <div className="m-0 bg-blk h-screen">
+            <Navbar/>
+            {/* <h1 className="text-xl font-bold">css working</h1> */}
         </div>
         </>
     );
