@@ -1,13 +1,11 @@
 import { Route, Routes } from "react-router-dom";
-import Temp from "./pages/Temp.jsx";
-import Hello from "./pages/Hello.jsx";
+import Landing from "./pages/Landing.jsx";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Temp/>} />
-        <Route path="/hello" element={<Hello/>} />
+        <Route path="/" element={<Landing/>} />
       </Routes>
     </>
   );
