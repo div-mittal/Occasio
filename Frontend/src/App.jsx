@@ -1,12 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 import Login from "./pages/login.jsx";
+import Landing from "./pages/Landing.jsx";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element />
-        <Route path="/login" element={<Login/>} />
+        <Route path="/" element={<Landing/>} />
       </Routes>
     </>
   );
