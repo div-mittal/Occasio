@@ -33,7 +33,7 @@ function Navbar({ page }) {
             <div className="gap-12 flex text-wht text-lg flex-row items-center justify-between">
                 <div onClick={()=>navigate('/')} className="hover:font-medium cursor-pointer">Home</div>
                 <div onClick={()=>navigate('/events')} className="hover:font-medium cursor-pointer">Events</div>
-                <div onClick={()=>navigate('/About Us')} className="hover:font-medium cursor-pointer">About Us</div>
+                <div onClick={()=>navigate('/about')} className="hover:font-medium cursor-pointer">About Us</div>
             </div>
             </div>
             <div 
