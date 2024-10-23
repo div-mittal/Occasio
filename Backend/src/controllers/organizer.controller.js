@@ -1,11 +1,12 @@
-import { asyncHandler } from '../utils/asyncHandler.js'
-import { uploadFile } from '../utils/uploadOnS3.js';
 import { Organizer } from '../models/organizer.model.js';
-import { Event } from '../models/event.model.js';
+import { Image } from '../models/image.model.js';
+import { asyncHandler } from '../utils/asyncHandler.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
+import { createFolder, deleteFolder } from '../utils/S3Utils.js';
 import { options } from '../constants.js';
 import fs from 'fs';
+import jwt from 'jsonwebtoken';
 
 const generateAcessAndRefreshTokens = async (organizerId) => {
     try {
@@ -49,13 +50,29 @@ const registerOrganizer = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Profile picture is required");
     }
 
-    const profilePicture = await uploadFile(profilePicturePath);
+    const folderName = `${name.split(" ").join("-").toLowerCase()}-${Date.now()}`;
+    const createdFolder = await createFolder(folderName);
+
+    if(!createdFolder){
+        throw new ApiError(500, "Something went wrong while creating the folder");
+    }
+
+    const profilePicture = await Image.create({
+        title: name + " Profile Picture",
+        folderName,
+        url: profilePicturePath
+    });
+
+    if(!profilePicture){
+        throw new ApiError(500, "Something went wrong while creating the profile picture");
+    }
 
     const organizer = await Organizer.create({
         name,
         email,
         mobile,
-        profilePicture,
+        profilePicture : profilePicture._id,
+        folderName,
         password,
         address : address || ""
     });
@@ -127,7 +144,7 @@ const loginOrganizer = asyncHandler(async (req, res) => {
 });
 
 const logoutOrganizer = asyncHandler(async (req, res) => {
-    await Organizer.findByIdAndUpdate(req.organizer?._id, 
+    await Organizer.findByIdAndUpdate(req.user?._id, 
         { 
             $unset: { refreshToken: 1 }
         },
@@ -178,7 +195,7 @@ const updateOrganizerPassword = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Old password and new password are required");
     }
 
-    const organizer = await Organizer.findById(req.organizer?._id);
+    const organizer = await Organizer.findById(req.user?._id);
     if(!organizer){
         throw new ApiError(404, "Organizer not found");
     }
@@ -203,7 +220,7 @@ const getCurrentOrganizer = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        new ApiResponse(200, req.organizer, "Current Organizer found successfully")
+        new ApiResponse(200, req.user, "Current Organizer found successfully")
     )
 });
 
@@ -213,7 +230,7 @@ const updateOrganizerDetails = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Name, Email, Mobile and Address are required");
     }
 
-    const organizer = await Organizer.findByIdAndUpdate(req.organizer?._id, 
+    const organizer = await Organizer.findByIdAndUpdate(req.user?._id, 
         {
             $set: { 
                 name, 
@@ -223,6 +240,10 @@ const updateOrganizerDetails = asyncHandler(async (req, res) => {
         },
         { new: true }
     ).select("-password");
+
+    if(!organizer){
+        throw new ApiError(500, "Something went wrong while updating the organizer details");
+    }
 
     return res
     .status(200)
@@ -237,13 +258,21 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Profile picture is required");
     }
 
-    const profilePicture = await uploadFile(profilePicturePath);
+    const profilePicture = await Image.create({
+        title: req.user?.name + " Profile Picture",
+        url: profilePicturePath
+    });
 
     if(!profilePicture){
         throw new ApiError(500, "Something went wrong while uploading the profile picture");
     }
 
-    const organizer = await Organizer.findByIdAndUpdate(req.organizer?._id,
+    const oldProfilePicture = req.user?.profilePicture;
+    if(oldProfilePicture){
+        await Image.findByIdAndDelete(oldProfilePicture);
+    }
+
+    const organizer = await Organizer.findByIdAndUpdate(req.user?._id,
         {
             $set: { profilePicture }
         },
@@ -257,6 +286,34 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
     )
 })
 
+const deleteOrganizer = asyncHandler(async (req, res) => {
+    const organizer = await Organizer.findById(req.user?._id);
+
+    if (!organizer) {
+        throw new ApiError(404, "Organizer not found");
+    }
+
+    const folderName = organizer.folderName;
+
+    if (folderName) {
+        await deleteFolder(folderName);
+    }
+
+    await Image.findByIdAndDelete(organizer.profilePicture);
+
+    const deletedOrganizer = await Organizer.findByIdAndDelete(req.user?._id);
+
+    if (!deletedOrganizer) {
+        throw new ApiError(500, "Something went wrong while deleting the organizer");
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, {}, "Organizer deleted successfully")
+        );
+});
+
 export { 
     registerOrganizer, 
     loginOrganizer,
@@ -266,4 +323,5 @@ export {
     getCurrentOrganizer,
     updateOrganizerDetails,
     updateProfilePicture,
+    deleteOrganizer
 }

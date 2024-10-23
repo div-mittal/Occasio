@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { registerOrganizer, loginOrganizer, logoutOrganizer, refreshAccessToken, updateOrganizerPassword, getCurrentOrganizer, updateOrganizerDetails, updateProfilePicture } from "../controllers/organizer.controller.js";
+import { registerOrganizer, loginOrganizer, logoutOrganizer, refreshAccessToken, updateOrganizerPassword, getCurrentOrganizer, updateOrganizerDetails, updateProfilePicture, deleteOrganizer } from "../controllers/organizer.controller.js";
+import { Organizer } from "../models/organizer.model.js";
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.route("/login").post(
 );
 
 router.route("/logout").post(
-    verifyJWT,
+    verifyJWT(Organizer),
     logoutOrganizer
 );
 
@@ -24,24 +25,29 @@ router.route("/refresh-token").post(
 );
 
 router.route("/update-password").post(
-    verifyJWT,
+    verifyJWT(Organizer),
     updateOrganizerPassword
 );
 
 router.route("/me").get(
-    verifyJWT,
+    verifyJWT(Organizer),
     getCurrentOrganizer
 );
 
 router.route("/update-details").patch(
-    verifyJWT,
+    verifyJWT(Organizer),
     updateOrganizerDetails
 );
 
 router.route("/update-profile-picture").patch(
-    verifyJWT,
+    verifyJWT(Organizer),
     upload.single("profilePicture"),
     updateProfilePicture
+);
+
+router.route("/delete").delete(
+    verifyJWT(Organizer),
+    deleteOrganizer
 );
 
 export default router;

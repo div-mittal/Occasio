@@ -26,6 +26,10 @@ const organizerSchema = new Schema(
             type: String
         },
         profilePicture: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Image"
+        },
+        folderName: {
             type: String,
             required: true
         },
