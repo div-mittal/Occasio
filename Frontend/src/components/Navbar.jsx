@@ -31,9 +31,9 @@ function Navbar({ page }) {
             <div className="m-0 gap-32 flex flex-row items-center justify-between">
             <img className="h-[3.5vh]" src="OCCASIO.png" alt="Occasio Logo"/>
             <div className="gap-12 flex text-wht text-lg flex-row items-center justify-between">
-                <div>Home</div>
-                <div>Events</div>
-                <div>About Us</div>
+                <div onClick={()=>navigate('/')} className="hover:font-medium cursor-pointer">Home</div>
+                <div onClick={()=>navigate('/events')} className="hover:font-medium cursor-pointer">Events</div>
+                <div onClick={()=>navigate('/About Us')} className="hover:font-medium cursor-pointer">About Us</div>
             </div>
             </div>
             <div 

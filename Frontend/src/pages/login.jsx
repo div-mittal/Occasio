@@ -5,7 +5,7 @@ const Login = () => {
   return (
     <div className='bg-blk min-h-screen flex flex-col'>
       <Navbar page="Login"/>
-      <div className="flex-grow px-32 flex flex-row-reverse items-center bg-blk text-white">
+      <div className="flex-grow px-32 flex flex-row-reverse justify-center gap-[20%] items-center bg-blk text-white">
         <div className="w-full max-w-sm p-6 shadow-md rounded-lg">
           <h1 className="text-3xl font-semibold text-center mb-6">LOGIN</h1>
           <form className="space-y-4">
@@ -33,7 +33,7 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              className="w-full py-3 bg-yellow-500 text-black font-semibold rounded-md hover:bg-ylw"
+              className="w-full py-3 bg-ylw text-black font-semibold rounded-md hover:bg-ylw"
             >
               Login
             </button>
@@ -44,6 +44,7 @@ const Login = () => {
             </a>
           </div>
         </div>
+        <img src='cal.png' alt='Calendar' className='w-2/5' />
       </div>
     </div>
   );
