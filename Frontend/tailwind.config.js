@@ -12,7 +12,7 @@ export default {
         "ylw" : "#E0AF31",
       },
       fontFamily: {
-        roboto: ['Afacad', 'Roboto', 'sans-serif'],
+        sans: ['Afacad', 'Roboto', 'sans-serif'],
       },
     },
   },
