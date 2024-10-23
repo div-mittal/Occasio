@@ -4,6 +4,7 @@ import cors from "cors";
 
 // routes import
 import organizerRouter from "./routes/organizer.routes.js";
+import eventRouter from "./routes/event.routes.js";
 
 const app = express();
 
@@ -27,5 +28,6 @@ app.use(cookieParser());
 
 // routes declaration
 app.use("/api/v1/organizers", organizerRouter);
+app.use("/api/v1/events", eventRouter);
 
 export { app }

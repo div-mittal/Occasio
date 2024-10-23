@@ -1,5 +1,6 @@
 import { Organizer } from '../models/organizer.model.js';
 import { Image } from '../models/image.model.js';
+import { Event } from '../models/event.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -217,10 +218,32 @@ const updateOrganizerPassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentOrganizer = asyncHandler(async (req, res) => {
+    const organizer = await Organizer.findById(req.user?._id).select("-password -folderName -refreshToken -accessToken -__v");
+    const profilePicture = await Image.findById(organizer?.profilePicture);
+
+    const eventData = []
+
+    for(let i = 0; i < organizer?.createdEvents.length; i++){
+        const event = await Event.findById(organizer?.createdEvents[i]);
+        const image = await Image.findById(event?.image);
+        const coverImage = await Image.findById(event?.coverImage);
+        eventData.push({
+            ...event._doc,
+            image: image.url,
+            coverImage: coverImage.url
+        });
+    }
+
+    const organizerData = {
+        ...organizer._doc,
+        profilePicture: profilePicture.url,
+        createdEvents: eventData
+    }
+
     return res
     .status(200)
     .json(
-        new ApiResponse(200, req.user, "Current Organizer found successfully")
+        new ApiResponse(200, organizerData, "Current Organizer found successfully")
     )
 });
 
@@ -292,14 +315,6 @@ const deleteOrganizer = asyncHandler(async (req, res) => {
     if (!organizer) {
         throw new ApiError(404, "Organizer not found");
     }
-
-    const folderName = organizer.folderName;
-
-    if (folderName) {
-        await deleteFolder(folderName);
-    }
-
-    await Image.findByIdAndDelete(organizer.profilePicture);
 
     const deletedOrganizer = await Organizer.findByIdAndDelete(req.user?._id);
 
