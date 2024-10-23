@@ -1,18 +1,23 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
+import { Route, Routes } from "react-router-dom";
+import Login from "./pages/Login.jsx";
+import Landing from "./pages/Landing.jsx";
+import About from "./pages/About.jsx";
+import Events from "./pages/Events.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Signup from "./pages/Signup.jsx";
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div className='flex justify-center items-center h-[100vh]'>
-        <h1 className='text-xl font-bold'>Hello is the css working</h1>
-      </div>
+      <Routes>
+        <Route path="/" element={<Landing/>} />
+        <Route path="/login" element={<Login/>} />
+        <Route path="/signup" element={<Signup/>} />
+        <Route path='/about' element={<About/>} />
+        <Route path='/events' element={<Events/>} />
+        <Route path="/dashboard" element={<Dashboard/>} />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
