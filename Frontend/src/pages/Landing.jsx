@@ -1,8 +1,10 @@
 import React from "react";
 import Navbar from "../components/Navbar";
 import { Button,ConfigProvider} from "antd";
+import { useNavigate } from 'react-router-dom'
 
 function Landing() {
+    const navigate = useNavigate(); 
     return (
         <>
         <ConfigProvider theme={{
@@ -21,7 +23,7 @@ function Landing() {
                     <div className="flex flex-col gap-[1.5rem]">
                         <div className="text-[1.15rem]  font-semibold">Sign Up below to begin</div>
                         <div className="flex gap-[1.5rem]">
-                            <Button type="primary" size='large' className='font-bold text-blk hover:!text-blk'>Attendee</Button>
+                            <Button onClick={() => navigate('/Signup')} type="primary" size='large' className='font-bold text-blk hover:!text-blk'>Attendee</Button>
                             <Button type="primary" size='large' className='font-bold text-blk hover:!text-blk'>Organizer</Button>
                             {/* <div className="text-[1.1rem] bg-ylw text-blk px-6 py-1.5 font-semibold rounded">Attendee</div> */}
                             {/* <div className="text-[1.1rem] bg-ylw text-blk px-6 py-1.5 font-semibold  rounded">Organizer</div> */}
