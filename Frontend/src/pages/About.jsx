@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 const About = () => {
   return (
     <div className="bg-blk h-screen">
-      <Navbar page="About" className="w-[full]"/>
+      <Navbar page="About"/>
       <div className="bg-blk text-white p-20 flex flex-col items-center">
         <h1 className="text-5xl font-bold mb-4">About Us</h1>
         <div className="w-full max-w-4xl text-center">
@@ -26,7 +26,7 @@ const About = () => {
             events can be.
           </p>
         </div>
-        <div className="m-10">
+        <div className="pt-10">
         <img src="OCCASIO.png" />
         </div>
       </div>
