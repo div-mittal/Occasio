@@ -1,6 +1,9 @@
 import mongoose, { Schema } from "mongoose"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
+import { Image } from "./image.model.js"
+import { Event } from "./event.model.js"
+import { deleteFolder } from "../utils/S3Utils.js"
 
 const organizerSchema = new Schema(
     {
@@ -26,6 +29,10 @@ const organizerSchema = new Schema(
             type: String
         },
         profilePicture: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Image"
+        },
+        folderName: {
             type: String,
             required: true
         },
@@ -51,6 +58,19 @@ const organizerSchema = new Schema(
 organizerSchema.pre('save', async function (next) {
     if (this.isModified('password')) {
         this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
+});
+
+organizerSchema.pre('findOneAndDelete', async function (next) {
+    const organizer = await this.model.findOne(this.getQuery());
+    if (organizer) {
+        if(organizer.folderName) {
+            await deleteFolder(organizer.folderName);
+        }
+        if (organizer.profilePicture) {
+            await Image.findByIdAndDelete(organizer.profilePicture);
+        }
     }
     next();
 });

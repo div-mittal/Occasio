@@ -2,8 +2,9 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 import { Organizer } from "../models/organizer.model.js";
+import { User } from "../models/user.model.js";
 
-export const verifyJWT = asyncHandler(async (req, res, next) => {
+export const verifyJWT = (model) => asyncHandler(async (req, res, next) => {
     try {
         const token = req.cookies?.accessToken || req.headers("Authorization").replace("Bearer ", "");
     
@@ -13,14 +14,18 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     
-        const organizer = await Organizer.findById(decodedToken?._id).select("-password -refreshToken");
+        const user = await model.findById(decodedToken?._id).select("-password -refreshToken");
     
-        if (!organizer) {
+        if (!user) {
             throw new ApiError(401, "Invalid Access Token");
         }
-        req.organizer = organizer;
+        req.user = user;
         next();
     } catch (error) {
         throw new ApiError(401, "Invalid Access Token");
     }
 });
+
+// Usage
+export const verifyOrganizerJWT = verifyJWT(Organizer);
+export const verifyUserJWT = verifyJWT(User);

@@ -1,4 +1,6 @@
 import mongoose, { Schema } from "mongoose"
+import { Image } from "./image.model.js"
+import { deleteFolder } from "../utils/S3Utils.js"
 
 const eventSchema = new Schema(
     {
@@ -64,5 +66,19 @@ const eventSchema = new Schema(
         timestamps: true
     }
 )
+
+eventSchema.pre('findOneAndDelete', async function (next) {
+    const docToDelete = await this.model.findOne(this.getQuery());
+    if (docToDelete) {
+        await Image.findByIdAndDelete(docToDelete.image);
+        await Image.findByIdAndDelete(docToDelete.coverImage);
+        if (docToDelete.gallery.length > 0) {
+            docToDelete.gallery.forEach(async (image) => {
+                await Image.findByIdAndDelete(image);
+            })
+        }
+    }
+    next();
+});
 
 export const Event = mongoose.model("Event", eventSchema)
