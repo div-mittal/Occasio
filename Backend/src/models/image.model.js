@@ -24,6 +24,9 @@ const imageSchema = new Schema(
 imageSchema.pre('save', async function (next) {
     if (this.isNew) {
         const Location = await uploadFile(this.url, this.folderName);
+        if (!Location) {
+            throw new Error("Image upload failed");
+        }
         this.url = Location;
     }
     next();

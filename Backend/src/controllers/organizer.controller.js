@@ -1,14 +1,12 @@
 import { Organizer } from '../models/organizer.model.js';
 import { Image } from '../models/image.model.js';
-import { Event } from '../models/event.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
-import { createFolder, deleteFolder } from '../utils/S3Utils.js';
+import { createFolder } from '../utils/S3Utils.js';
 import { options } from '../constants.js';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
-import { url } from 'inspector';
 
 const generateAcessAndRefreshTokens = async (organizerId) => {
     try {
@@ -330,7 +328,9 @@ const updateOrganizerDetails = asyncHandler(async (req, res) => {
             $set: { 
                 name, 
                 email,
-                mobile 
+                mobile,
+                address,
+                folderName
             }
         },
         { new: true }
