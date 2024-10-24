@@ -2,3 +2,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@layer utilities {
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for Chrome, Safari and Opera */
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+      scrollbar-width: none; /* Hide scrollbar for Firefox */
+    }
+    .minimal-scrollbar::-webkit-scrollbar {
+        width: 6px; /* Width of the scrollbar */
+        height: 6px; /* Height of the scrollbar for horizontal scrolling */
+      }
+    
+      .minimal-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.3); /* Scrollbar thumb color */
+        border-radius: 10px; /* Rounded edges for the scrollbar thumb */
+      }
+    
+      .minimal-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.5); /* Thumb color when hovered */
+      }
+    
+      .minimal-scrollbar::-webkit-scrollbar-track {
+        background: transparent; /* Scrollbar track color */
+      }
+    
+      /* For Firefox */
+      .minimal-scrollbar {
+        scrollbar-width: thin; /* Makes the scrollbar thinner */
+        scrollbar-color: rgba(255, 255, 255, 0.3) transparent; /* Thumb and track colors */
+      }
+  }
