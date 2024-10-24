@@ -8,6 +8,7 @@ import { createFolder, deleteFolder } from '../utils/S3Utils.js';
 import { options } from '../constants.js';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
+import { url } from 'inspector';
 
 const generateAcessAndRefreshTokens = async (organizerId) => {
     try {
@@ -218,32 +219,103 @@ const updateOrganizerPassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentOrganizer = asyncHandler(async (req, res) => {
-    const organizer = await Organizer.findById(req.user?._id).select("-password -folderName -refreshToken -accessToken -__v");
-    const profilePicture = await Image.findById(organizer?.profilePicture);
-
-    const eventData = []
-
-    for(let i = 0; i < organizer?.createdEvents.length; i++){
-        const event = await Event.findById(organizer?.createdEvents[i]);
-        const image = await Image.findById(event?.image);
-        const coverImage = await Image.findById(event?.coverImage);
-        eventData.push({
-            ...event._doc,
-            image: image.url,
-            coverImage: coverImage.url
-        });
-    }
-
-    const organizerData = {
-        ...organizer._doc,
-        profilePicture: profilePicture.url,
-        createdEvents: eventData
-    }
+    const organizer = await Organizer.aggregate([
+        {
+            $match: { _id: req.user?._id }
+        },
+        {
+            $lookup: {
+                from: "images",
+                localField: "profilePicture",
+                foreignField: "_id",
+                as: "profilePicture",
+                pipeline: [
+                    {
+                        $project: {
+                            title: 1,
+                            url: 1,
+                            _id: 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: "$profilePicture"
+        },
+        {
+            $lookup: {
+                from: "events",
+                localField: "_id",
+                foreignField: "createdBy",
+                as: "events",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "images",
+                            localField: "image",
+                            foreignField: "_id",
+                            as: "image",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        title: 1,
+                                        url: 1,
+                                        _id: 0
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from : "images",
+                            localField: "coverImage",
+                            foreignField: "_id",
+                            as: "coverImage",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        title: 1,
+                                        url: 1,
+                                        _id: 0
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $project: {
+                            title: 1,
+                            description: 1,
+                            startDate: 1,
+                            endDate: 1,
+                            location: 1,
+                            date : 1,
+                            time: 1,
+                            genre: 1,
+                            image: 1,
+                            coverImage: 1,
+                            status: 1
+                        }
+                    },
+                    
+                ]
+            }
+        },
+        {
+            $project: {
+                password: 0,
+                refreshToken: 0,
+                folderName: 0,
+            }
+        }
+    ]);
 
     return res
     .status(200)
     .json(
-        new ApiResponse(200, organizerData, "Current Organizer found successfully")
+        new ApiResponse(200, organizer, "Current Organizer found successfully")
     )
 });
 
