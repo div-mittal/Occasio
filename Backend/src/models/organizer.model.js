@@ -71,6 +71,11 @@ organizerSchema.pre('findOneAndDelete', async function (next) {
         if (organizer.profilePicture) {
             await Image.findByIdAndDelete(organizer.profilePicture);
         }
+        if(organizer.createdEvents) {
+            for (const event of organizer.createdEvents) {
+                await Event.findByIdAndDelete(event);
+            }
+        }
     }
     next();
 });
