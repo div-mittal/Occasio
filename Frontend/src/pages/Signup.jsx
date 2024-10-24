@@ -38,40 +38,40 @@ return (
                     {
                         role==="Attendee" && 
                         <div className='h-[75%] my-8 flex flex-col gap-[1rem]'>
-                        <div className='flex gap-[50px]'>
+                        <div className='flex'>
                         <input type="text" placeholder="Full Name" className='w-full bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
                         {/* <input type="text" placeholder="Last Name" className='w-[50%] bg-transparent p-2 border border-wht border-opacity-25 rounded my-2' /> */}
                         </div>
-                        <div className='flex gap-[0.6rem]'>
+                        <div className='flex gap-4'>
                         <input type="text" placeholder="Email" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
                         <input type="text" placeholder="Phone Number" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
                         </div>
-                        <div className='flex gap-[0.6rem]'>
+                        <div className='flex gap-4'>
                         <input type="password" placeholder="Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
                         <input type="password" placeholder="Confirm Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
 
-                        </div>
+                        </div>      
                         
                         </div>
                     }
                     {
                         role==="Organizer" &&
                         <div className='h-[75%] my-4 flex flex-col'>
-                        <div className='flex gap-[50px]'>
+                        <div className='flex'>
                         <input type="text" placeholder="Full Name" className='w-full bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
                         {/* <input type="text" placeholder="Last Name" className='w-[50%] bg-transparent p-2 border border-wht border-opacity-25 rounded my-2' /> */}
                         </div>
-                        <div className='flex gap-[0.6rem]'>
+                        <div className='flex gap-4'>
                         <input type="text" placeholder="Email" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
                         <input type="text" placeholder="Phone Number" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
                         </div>
-                        <div className='flex gap-[0.6rem]'>
+                        <div className='flex gap-4'>
                         <input type="password" placeholder="Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
                         <input type="password" placeholder="Confirm Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
 
                         </div>
 
-                        <div className='flex gap-[50px]'>
+                        <div className='flex'>
                         {/* <input type="text" placeholder="Phone Number" className='w-[50%] bg-transparent p-2 border border-wht border-opacity-25 rounded my-2 ' /> */}
                         <input type="text" placeholder="Address" className='w-full bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
                         </div>
