@@ -3,7 +3,7 @@ import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { Organizer } from "../models/organizer.model.js";
 
-import { createEvent, updateEvent, removeImagesFromGallery, addImagesToGallery } from "../controllers/event.controller.js";
+import { createEvent, updateEvent, removeImagesFromGallery, addImagesToGallery, getEventInfo } from "../controllers/event.controller.js";
 
 
 const router = Router();
@@ -38,6 +38,10 @@ router.route("/add-images/:eventid").put(
 router.route("/remove-images/:eventid").delete(
     verifyJWT(Organizer),
     removeImagesFromGallery
+);
+
+router.route("/info/:eventid").get(
+    getEventInfo
 );
 
 export default router;

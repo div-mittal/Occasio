@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import fs from "fs"
+import mongoose from "mongoose"
 
 
 const createEvent = asyncHandler(async (req, res) => {
@@ -299,13 +300,145 @@ const addImagesToGallery = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(new ApiResponse(200, updatedEvent, "Gallery images added successfully"))
+})
 
+const getEventInfo = asyncHandler(async (req, res) => {
+    const { eventid } = req.params
+    console.log(eventid)
+    const eventData = await Event.aggregate([
+        {
+            $match: { _id: new mongoose.Types.ObjectId(eventid) }
+        },
+        {
+            $lookup: {
+                from: "images",
+                localField: "image",
+                foreignField: "_id",
+                as: "image",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0,
+                            __v: 0,
+                            folderName: 0,
+                            createdAt: 0,
+                            updatedAt: 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: "$image"
+        },
+        {
+            $lookup: {
+                from: "images",
+                localField: "coverImage",
+                foreignField: "_id",
+                as: "coverImage",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0,
+                            __v: 0,
+                            folderName: 0,
+                            createdAt: 0,
+                            updatedAt: 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: "$coverImage"
+        },
+        {
+            $lookup: {
+                from: "images",
+                localField: "gallery",
+                foreignField: "_id",
+                as: "gallery",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0,
+                            __v: 0,
+                            folderName: 0,
+                            createdAt: 0,
+                            updatedAt: 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: "organizers",
+                localField: "createdBy",
+                foreignField: "_id",
+                as: "createdBy",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "images",
+                            localField: "profilePicture",
+                            foreignField: "_id",
+                            as: "profilePicture",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        _id: 0,
+                                        __v: 0,
+                                        folderName: 0,
+                                        createdAt: 0,
+                                        updatedAt: 0
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $unwind: "$profilePicture"
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            __v: 0,
+                            password: 0,
+                            createdAt: 0,
+                            updatedAt: 0,
+                            folderName: 0,
+                            createdEvents: 0,
+                            refreshToken: 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: "$createdBy"
+        },
+        {
+            $project: {
+                __v: 0
+            }
+        }
+    ])
+
+    if(eventData.length === 0){
+        throw new ApiError(404, "Event not found")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, eventData[0], "Event data retrieved successfully"))
 })
 
 export { 
     createEvent,
     updateEvent,
     removeImagesFromGallery,
-    addImagesToGallery
-
+    addImagesToGallery,
+    getEventInfo
 }
