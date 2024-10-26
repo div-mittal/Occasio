@@ -1,4 +1,4 @@
-import { User } from "../models/user.model";
+import { User } from "../models/user.model.js";
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken';
 
 const generateAcessAndRefreshTokens = async (userID) => {
     try {
-        const user = await User.findById(userId);
+        const user = await User.findById(userID);
         const accessToken = user.generateAccessToken();
         const refreshToken = user.generateRefreshToken();
         user.refreshToken = refreshToken;
@@ -24,7 +24,7 @@ const generateAcessAndRefreshTokens = async (userID) => {
 
 
 const registerUser = asyncHandler(async (req, res, next) => {
-    const { email, name, moblie, password } = req.body;
+    const { email, name, mobile, password } = req.body;
 
     if(
         [name, email, password].some(field => field?.trim() === undefined || field?.trim() === null || field === "" )
@@ -32,19 +32,18 @@ const registerUser = asyncHandler(async (req, res, next) => {
         throw new ApiError(400, "Please provide all the required fields");
     }
 
-    const existedUser = await Organizer.findOne({
+    const existedUser = await User.findOne({
         $or: [{ email }, { mobile }]
     })
 
     if(existedUser){
-        fs.unlinkSync(req.file?.path);
         throw new ApiError(409, "User with this email or mobile already exists");
     }
 
     const user = await User.create({ 
         email, 
         name, 
-        moblie, 
+        mobile, 
         password 
     });
 

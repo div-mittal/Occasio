@@ -2,8 +2,10 @@ import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { Organizer } from "../models/organizer.model.js";
+import { User } from "../models/user.model.js";
 
 import { createEvent, updateEvent, removeImagesFromGallery, addImagesToGallery, getEventInfo } from "../controllers/event.controller.js";
+import { registerForEvent } from "../controllers/participant.controller.js";
 
 
 const router = Router();
@@ -42,6 +44,11 @@ router.route("/remove-images/:eventid").delete(
 
 router.route("/info/:eventid").get(
     getEventInfo
+);
+
+router.route("/register/:eventID").post(
+    verifyJWT(User),
+    registerForEvent
 );
 
 export default router;

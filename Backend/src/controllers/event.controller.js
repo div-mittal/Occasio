@@ -16,10 +16,10 @@ const createEvent = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Organizer not found")
     }
     
-    const { title, description, date, time, location, type, capacity, genre } = req.body
+    const { title, description, date, time, location, state, city, type, capacity, genre } = req.body
 
     if(
-        [title, description, date, time, location, type, capacity, genre].some((field) => field === undefined || field === "")
+        [title, description, date, time, location, state, city, type, capacity, genre].some((field) => field === undefined || field === "")
     ){
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
@@ -77,6 +77,8 @@ const createEvent = asyncHandler(async (req, res) => {
         date,
         time,
         location,
+        state,
+        city,
         type,
         capacity,
         genre,
@@ -138,15 +140,13 @@ const updateEvent = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Unauthorized")
     }
 
-    const { title, description, date, time, location, type, capacity, genre } = req.body
+    const { title, description, date, time, location, state, city, type, capacity, genre } = req.body
 
     if(
-        [title, description, date, time, location, type, capacity, genre].some((field) => field === undefined || field === "")
+        [title, description, date, time, location, state, city, type, capacity, genre].some((field) => field === undefined || field === "")
     ){
         throw new ApiError(400, "All fields are required")
     }
-
-    console.log(req.files)
 
     const imagePath = req.files?.image[0]?.path
     console.log(imagePath)
@@ -185,6 +185,8 @@ const updateEvent = asyncHandler(async (req, res) => {
             date,
             time,
             location,
+            state,
+            city,
             type,
             image,
             coverImage,

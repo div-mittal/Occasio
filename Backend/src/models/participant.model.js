@@ -1,4 +1,5 @@
 import mongoose, {Schema} from "mongoose";
+import qrcode from "qrcode";
 
 const participantSchema = new Schema(
     {
@@ -30,5 +31,10 @@ const participantSchema = new Schema(
         timestamps: true
     }
 )
+
+participantSchema.pre("save", async function(next){
+    this.qrCode = await qrcode.toDataURL(`${this._id}`);
+    next();
+})
 
 export const Participant = mongoose.model("Participant", participantSchema)
