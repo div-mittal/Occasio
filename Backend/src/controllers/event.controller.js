@@ -1,9 +1,11 @@
 import { Event } from "../models/event.model.js"
 import { Organizer } from "../models/organizer.model.js"
+import { Participant } from "../models/participant.model.js"
 import { Image } from "../models/image.model.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
+import { sendMail } from "../utils/mailSender.js"
 import fs from "fs"
 import mongoose from "mongoose"
 
@@ -434,6 +436,18 @@ const getEventInfo = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, eventData[0], "Event data retrieved successfully"))
 })
+
+// const sendRSVPMailsToParticipants = asyncHandler(async (req, res) => {
+//     const { eventid } = req.params
+//     const event = await Event.findById(eventid)
+//     if (!event) {
+//         throw new ApiError(404, "Event not found")
+//     }
+
+//     return res
+//     .status(200)
+//     .json(new ApiResponse(200, participants, "Participants retrieved successfully"))
+// })
 
 export { 
     createEvent,

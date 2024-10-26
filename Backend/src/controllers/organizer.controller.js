@@ -80,7 +80,6 @@ const registerOrganizer = asyncHandler(async (req, res) => {
     const { accessToken, refreshToken } = await generateAcessAndRefreshTokens(organizer._id);
     
     organizer.refreshToken = refreshToken;
-    organizer.accessToken = accessToken;
     await organizer.save({ validateBeforeSave: false });
 
     const createdOrganizer = await Organizer.findById(organizer._id).select(
@@ -128,6 +127,10 @@ const loginOrganizer = asyncHandler(async (req, res) => {
 
     // generate access and refresh token
     const { accessToken, refreshToken } = await generateAcessAndRefreshTokens(organizer._id);
+
+    // save refresh token to the organizer
+    organizer.refreshToken = refreshToken;
+    await organizer.save({ validateBeforeSave: false });
 
     // send cookie
     const loggedInOrganizer = await Organizer.findById(organizer._id).select("-password -refreshToken");
@@ -179,6 +182,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 
     const { accessToken, refreshToken } = await generateAcessAndRefreshTokens(organizer._id);
+
+    organizer.refreshToken = refreshToken;
+    await organizer.save({ validateBeforeSave: false });
 
     return res
     .status(200)
