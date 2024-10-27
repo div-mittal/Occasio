@@ -451,10 +451,53 @@ const getEventInfo = asyncHandler(async (req, res) => {
 //     .json(new ApiResponse(200, participants, "Participants retrieved successfully"))
 // })
 
+const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
+    const organizerID = req.user?.id
+    if(!organizerID){
+        throw new ApiError(401, "Unauthorized")
+    }
+
+    const organizer = await Organizer.findById(organizerID)
+    if (!organizer) {
+        throw new ApiError(404, "Organizer not found")
+    }
+
+    const { eventid } = req.params
+    const event = await Event.findById(eventid)
+
+    if (!event) {
+        throw new ApiError(404, "Event not found")
+    }
+
+    if(event.createdBy.toString() !== organizer._id.toString()){
+        throw new ApiError(401, "Unauthorized")
+    }
+
+    const { qrCode } = req.body
+    const participant = await Participant.findById(qrCode)
+
+    if (!participant) {
+        throw new ApiError(404, "Participant not found")
+    }
+
+    if (participant.event.toString() !== event._id.toString()) {
+        throw new ApiError(404, "Participant not found")
+    }
+
+    if (participant.rsvpStatus != "going") {
+        throw new ApiError(400, "Participant not going")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, participant, "Participant verified successfully"))
+})
+
 export { 
     createEvent,
     updateEvent,
     removeImagesFromGallery,
     addImagesToGallery,
-    getEventInfo
+    getEventInfo,
+    verifyRSVPUsingQRCode
 }
