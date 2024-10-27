@@ -8,6 +8,16 @@ const Signup = () => {
     const navigate = useNavigate(); 
     const location = useLocation();
     const [role, setRole] = useState(location.state?.role || 'Attendee');
+    const [profilePic, setProfilePic] = useState(null);
+    const [profilePicName, setProfilePicName] = useState("");
+
+    const handleProfilePicChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setProfilePic(URL.createObjectURL(file)); // Create preview URL
+            setProfilePicName(file.name); // Set file name
+        }
+    };
     // const [phoneNumber, setPhoneNumber] = useState('');
 return (
     <div className='bg-blk h-screen text-wht'>
@@ -67,16 +77,48 @@ return (
                         </div>
                         <div className='flex gap-4'>
                         <input type="password" placeholder="Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
-                        <input type="password" placeholder="Confirm Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
+                        {/* <input type="password" placeholder="Confirm Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' /> */}
+                        <input type="text" placeholder="Address" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
 
                         </div>
 
-                        <div className='flex'>
+                        {/* <div className='flex'> */}
                         {/* <input type="text" placeholder="Phone Number" className='w-[50%] bg-transparent p-2 border border-wht border-opacity-25 rounded my-2 ' /> */}
-                        <input type="text" placeholder="Address" className='w-full bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
+                        {/* <input type="text" placeholder="Address" className='w-full bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' /> */}
+                        {/* </div> */}
+                        {/* <div className='flex'>
+                        <input type="file" onChange={handleProfilePicChange} placeholder="Address" className='w-full bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
+                        {profilePic && <img src={profilePic} alt="Profile Preview" className='w-20 h-20 rounded-full object-cover' />}
+
+                        </div> */}
+                        <div className='flex my-2 items-center gap-4 border border-wht border-opacity-25 rounded'>
+                            {/* File upload input with "Choose File" label */}
+                            <label className='w-[25%] bg-transparent py-2.5 my-0 px-6 border-r border-wht border-opacity-25 cursor-pointer text-center'>
+                                <span className="text-wht">Choose Profile Pic</span>
+                                <input 
+                                    type="file" 
+                                    onChange={handleProfilePicChange} 
+                                    className='hidden' 
+                                    accept="image/*" // Accepts only image files
+                                />
+                            </label>
+                            
+                            {/* Display chosen file preview */}
+                            {profilePic ? (
+                                <div className="flex gap-4 justify-center items-center">
+                                    <img 
+                                        src={profilePic} 
+                                        alt="Profile Preview" 
+                                        className='w-10 h-10 rounded-full object-cover border border-wht border-opacity-25' 
+                                    />
+                                    <span className="text-wht opacity-75 text-md">{profilePicName}</span>
+                                </div>
+
+                            ) : (
+                                <span className="text-wht opacity-75">No file chosen</span>
+                            )}
                         </div>
-                        
-                        </div>
+                    </div>
                     }
                     <div className='flex justify-end'>
                     <Button onClick={() => navigate('/Dashboard')} type="primary" size='large' className='font-bold text-blk hover:!text-blk'>Register</Button>
