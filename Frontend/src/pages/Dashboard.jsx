@@ -1,7 +1,9 @@
 import React from 'react'
 import Navbar from '../components/Navbar.jsx'
+import { useNavigate } from 'react-router-dom'
 import Ecard from '../components/Ecard.jsx'
 const Dashboard = () => {
+    const navigate = useNavigate();
     return (
         <div className='h-[100vh] bg-blk flex flex-col'>
             <Navbar/>
@@ -19,7 +21,7 @@ const Dashboard = () => {
                     <Ecard/>
                     </div>
                     <div className='flex justify-center items-center h-12 w-12 bg-ylw rounded-md absolute bottom-16 right-12'>
-                        <h1 className='text-4xl font-bold text-blk'>+</h1>
+                        <h1 className='text-4xl font-bold text-blk hover:cursor-pointer' onClick={()=>{navigate('/add')}}>+</h1>
                     </div>
                 </div>
             </div>
