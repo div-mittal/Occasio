@@ -73,11 +73,13 @@ return (
                         </div>
                         <div className='flex gap-4'>
                         <input type="text" placeholder="Email" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
-                        <input type="text" placeholder="Phone Number" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
+                        <input type="password" placeholder="Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
+
                         </div>
                         <div className='flex gap-4'>
-                        <input type="password" placeholder="Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
                         {/* <input type="password" placeholder="Confirm Password" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' /> */}
+                        <input type="text" placeholder="Phone Number" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
+
                         <input type="text" placeholder="Address" className='w-[50%] bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2' />
 
                         </div>
