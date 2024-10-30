@@ -39,15 +39,15 @@ return (
                 }} >Click Here</div>
             </div>
             </div>
-            <div className='flex h-[55vh] ml-20 mr-10 mt-5'>
-                <div className='p-5 px-6 rounded border-wht border h-full w-[55%] flex flex-col'>
+            <div className='flex h-[55vh] mx-20  lg:mr-10 mt-5'>
+                <div className='p-5 px-6 rounded border-wht border h-full lg:w-[55%] lg:flex flex-col w-[100%]'>
                     <div className='cursor-default text-[1.4rem] flex justify-between w-full'>
                         <div>Sign Up</div>
                         <div className='opacity-25'>{role == "Attendee" ? "Attendee" : "Organizer"}</div>
                     </div>
                     {
                         role==="Attendee" && 
-                        <div className='h-[75%] my-8 flex flex-col gap-[1rem]'>
+                        <div className='h-[75%] mt-8 flex flex-col gap-[1rem]'>
                         <div className='flex'>
                         <input type="text" placeholder="Full Name" className='w-full bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
                         {/* <input type="text" placeholder="Last Name" className='w-[50%] bg-transparent p-2 border border-wht border-opacity-25 rounded my-2' /> */}
@@ -66,7 +66,7 @@ return (
                     }
                     {
                         role==="Organizer" &&
-                        <div className='h-[75%] my-4 flex flex-col'>
+                        <div className='h-[75%] mt-4 flex flex-col'>
                         <div className='flex'>
                         <input type="text" placeholder="Full Name" className='w-full bg-transparent p-2 px-6 border border-wht border-opacity-25 rounded my-2 ' />
                         {/* <input type="text" placeholder="Last Name" className='w-[50%] bg-transparent p-2 border border-wht border-opacity-25 rounded my-2' /> */}
@@ -95,7 +95,7 @@ return (
                         </div> */}
                         <div className='flex my-2 items-center gap-4 border border-wht border-opacity-25 rounded'>
                             {/* File upload input with "Choose File" label */}
-                            <label className='w-[25%] bg-transparent py-2.5 my-0 px-6 border-r border-wht border-opacity-25 cursor-pointer text-center'>
+                            <label className=' bg-transparent py-2.5 my-0 px-6 border-r border-wht border-opacity-25 cursor-pointer text-center'>
                                 <span className="text-wht">Choose Profile Pic</span>
                                 <input 
                                     type="file" 
@@ -122,11 +122,21 @@ return (
                         </div>
                     </div>
                     }
-                    <div className='flex justify-end'>
-                    <Button onClick={() => navigate('/Dashboard')} type="primary" size='large' className='font-bold text-blk hover:!text-blk'>Register</Button>
-                    </div>
+                    {
+                        role==="Attendee" && 
+                        <div className='flex mt-[-1rem] justify-end'>
+                        <Button onClick={() => navigate('/Dashboard')} type="primary" size='large' className='lg:m-0 font-bold text-blk hover:!text-blk'>Register</Button>
+                        </div>
+                    }
+                    {
+                        role==="Organizer" && 
+                        <div className='flex justify-end'>
+                        <Button onClick={() => navigate('/Dashboard')} type="primary" size='large' className='lg:m-0 font-bold text-blk hover:!text-blk'>Register</Button>
+                        </div>
+                    }
+                    
                 </div>
-                <img className='w-[40%] h-[140%] mt-[-5%]' src="cal.png" alt="" />
+                <img className='w-[40%] h-[140%] mt-[-5%] xsm:hidden lg:flex' src="cal.png" alt="" />
             </div>
             </ConfigProvider>
     </div>

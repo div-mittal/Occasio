@@ -15,12 +15,12 @@ function Landing() {
       }}>
         <div className="m-0 bg-blk h-screen text-wht">
             <Navbar/>
-            <div className="mx-20 ml-12 my-16 mb-0  h-[55vh] flex items-center ">
-                <div className="px-32 py-20 h-[100%] w-[50%] flex flex-col gap-[3rem] text-wht border-r border-wht border-{0.5px} border-opacity-50 height-100%">
+            <div className="mx-20 ml-12 mt-14 mb-0  h-[55vh] flex justify-center items-center ">
+                <div className="lg:flex xsm:w-[100%] xsm:border-transparent items-center justify-center px-16 h-[100%] w-[50%] flex flex-col gap-[3rem] text-wht border-r lg:border-wht border-{0.5px} border-opacity-50 height-100%">
                     <h1 className="cursor-default text-xl">
                     Effortlessly organize, manage, and track attendance for conferences, workshops, and private gatherings. Create events, send invites, manage RSVPs, and track guest preferences—all in one place.
                     </h1>
-                    <div className="flex flex-col gap-[1.5rem]">
+                    <div className="flex justify-start w-[100%] flex-col gap-[1.5rem]">
                         <div className="text-[1.15rem] cursor-default font-semibold">Sign Up below to begin</div>
                         <div className="flex gap-[1.5rem]">
                             <Button onClick={() => navigate('/Signup', { state: { role: 'Attendee' }})} type="primary" size='large' className='font-bold text-blk hover:!text-blk'>Attendee</Button>
@@ -30,7 +30,7 @@ function Landing() {
                         </div>
                     </div>
                 </div>
-                <img src="landing.png" alt="" className="w-[38%] ml-28 px-4" />
+                <img src="landing.png" alt="" className=" lg:flex xsm:hidden  w-[38%] ml-28 px-4 " />
             </div>
             <img src="landingFlower.png" className="absolute bottom-0 left-0 h-[9rem] "alt="" />
         </div>
