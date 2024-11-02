@@ -71,6 +71,11 @@ organizerSchema.pre('findOneAndDelete', async function (next) {
         if (organizer.profilePicture) {
             await Image.findByIdAndDelete(organizer.profilePicture);
         }
+        if(organizer.createdEvents) {
+            for (const event of organizer.createdEvents) {
+                await Event.findByIdAndDelete(event);
+            }
+        }
     }
     next();
 });
@@ -82,9 +87,9 @@ organizerSchema.methods.isPasswordCorrect = async function (password) {
 organizerSchema.methods.generateAccessToken = function () {
     return jwt.sign({
         _id: this._id,
-        username: this.username,
         email: this.email,
-        fullname: this.fullname,
+        mobile: this.mobile,
+        name : this.name
     }, 
     process.env.ACCESS_TOKEN_SECRET, {
         

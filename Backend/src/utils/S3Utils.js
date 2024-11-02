@@ -18,9 +18,12 @@ const uploadFile = async (localFilePath, folderName) => {
             return null;
         }
         const fileContent = fs.readFileSync(localFilePath);
+        const imageType = path.extname(localFilePath);
+        const imageName = path.basename(localFilePath).toLowerCase().split(" ").join("-").split(".").join("-") + "-" + Date.now() + imageType;
+
         const params = {
             Bucket: process.env.AWS_BUCKET_NAME,
-            Key: folderName + "/" + path.basename(localFilePath),
+            Key: folderName + "/" + imageName,
             Body: fileContent
         };
         const result = await s3.upload(params).promise();
@@ -34,11 +37,13 @@ const uploadFile = async (localFilePath, folderName) => {
 }
 
 const deleteFile = async (key, folderName) => {
+    const imageKey = key.split("/").pop();
     try{
         const params = {
             Bucket: process.env.AWS_BUCKET_NAME,
-            Key: folderName + "/" + key
+            Key: folderName + "/" + imageKey
         };
+        console.log(params)
         await s3.deleteObject(params).promise();
     }
     catch(error){
