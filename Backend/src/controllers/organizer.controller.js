@@ -297,7 +297,6 @@ const getCurrentOrganizer = asyncHandler(async (req, res) => {
                             location: 1,
                             date : 1,
                             time: 1,
-                            genre: 1,
                             image: 1,
                             coverImage: 1,
                             status: 1
@@ -462,7 +461,6 @@ const getEvents = asyncHandler(async (req, res) => {
                             gallery: 0,
                             type: 0,
                             capacity: 0,
-                            genre: 0,
                             qrCode: 0,
                             attendees: 0,
                             createdBy: 0,

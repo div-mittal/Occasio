@@ -125,7 +125,6 @@ const registerForEvent = asyncHandler(async (req, res, next) => {
                             qrCode: 0,
                             type: 0,
                             capacity: 0,
-                            genre: 0,
                             createdAt: 0,
                             updatedAt: 0,
                             __v: 0
