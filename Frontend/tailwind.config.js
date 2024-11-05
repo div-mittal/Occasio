@@ -14,6 +14,9 @@ export default {
       fontFamily: {
         sans: ['Afacad', 'Roboto', 'sans-serif'],
       },
+      screens:{
+        'xsm':'300px',
+      },
     },
     screens: {
       'sm': '640px',

@@ -34,6 +34,9 @@ const participantSchema = new Schema(
 
 participantSchema.pre("save", async function(next){
     this.qrCode = await qrcode.toDataURL(`${this._id}`);
+    if(!this.qrCode){
+        throw new Error("QR Code generation failed");
+    }
     next();
 })
 

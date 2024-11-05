@@ -72,7 +72,7 @@ const Login = () => {
             </a>
           </div>
         </div>
-        <img src='cal.png' alt='Calendar' className='w-2/5' />
+        <img src='cal.png' alt='Calendar' className='w-2/5 xsm:hidden lg:flex' />
       </div>
     </div>
   );
