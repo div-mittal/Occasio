@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
-
+import { useNavigate } from 'react-router-dom';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
+  const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      // const response = await fetch(`/api/login?username=${username}&password=${password}`, {
-      //   method: 'GET',
-      // });
-      // const data = await response.json();
-      // console.log(data);
-      console.log('Logging in...');
-      console.log('Username:', username);
-      console.log('Password: ',password)
+      const response = await fetch(`http://localhost:9002/api/v1/organizers/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email:username,mobile:username, password }),
+      });
+      const data = await response.json();
+      if(data.error){
+        alert(data.error);
+      }
+      navigate('/dashboard');
+      
     } catch (error) {
       console.error('Error logging in:', error);
     }
