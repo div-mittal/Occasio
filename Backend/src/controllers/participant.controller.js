@@ -1,7 +1,6 @@
 import { Participant } from "../models/participant.model.js";
 import { Event } from "../models/event.model.js";
 import { User } from "../models/user.model.js";
-
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -123,6 +122,7 @@ const registerForEvent = asyncHandler(async (req, res, next) => {
                             coverImage: 0,
                             gallery: 0,
                             attendees: 0,
+                            qrCode: 0,
                             type: 0,
                             capacity: 0,
                             genre: 0,

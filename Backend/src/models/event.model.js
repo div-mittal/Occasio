@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose"
 import { Image } from "./image.model.js"
-import { deleteFolder } from "../utils/S3Utils.js"
+import qrcode from "qrcode"
 
 const eventSchema = new Schema(
     {
@@ -59,6 +59,9 @@ const eventSchema = new Schema(
             type: String,
             required: true
         },
+        qrCode: {
+            type: String
+        },
         attendees: [
             {
                 type: Schema.Types.ObjectId,
@@ -88,5 +91,16 @@ eventSchema.pre('findOneAndDelete', async function (next) {
     }
     next();
 });
+
+eventSchema.pre("save", async function(next){
+    this.qrCode = await qrcode.toDataURL(`${process.env.FRONTEND_URL}/event/${this._id}`)
+    .then((url) => {
+        return url;
+    })
+    .catch((err) => {
+        throw new Error("QR Code generation failed");
+    })    
+    next();
+})
 
 export const Event = mongoose.model("Event", eventSchema)

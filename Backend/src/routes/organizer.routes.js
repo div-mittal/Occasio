@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { registerOrganizer, loginOrganizer, logoutOrganizer, refreshAccessToken, updateOrganizerPassword, getCurrentOrganizer, updateOrganizerDetails, updateProfilePicture, deleteOrganizer } from "../controllers/organizer.controller.js";
+import { registerOrganizer, loginOrganizer, logoutOrganizer, refreshAccessToken, updateOrganizerPassword, getCurrentOrganizer, updateOrganizerDetails, updateProfilePicture, deleteOrganizer, getEvents } from "../controllers/organizer.controller.js";
 import { Organizer } from "../models/organizer.model.js";
 
 const router = Router();
@@ -43,6 +43,11 @@ router.route("/update-profile-picture").patch(
     verifyJWT(Organizer),
     upload.single("profilePicture"),
     updateProfilePicture
+);
+
+router.route("/events").get(
+    verifyJWT(Organizer),
+    getEvents
 );
 
 router.route("/delete").delete(
