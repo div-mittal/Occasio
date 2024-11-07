@@ -297,7 +297,6 @@ const getCurrentOrganizer = asyncHandler(async (req, res) => {
                             location: 1,
                             date : 1,
                             time: 1,
-                            genre: 1,
                             image: 1,
                             coverImage: 1,
                             status: 1
@@ -407,6 +406,95 @@ const deleteOrganizer = asyncHandler(async (req, res) => {
         );
 });
 
+const getEvents = asyncHandler(async (req, res) => {
+    const events = await Organizer.aggregate([
+        {
+            $match: { _id: req.user?._id }
+        },
+        {
+            $lookup: {
+                from: "events",
+                localField: "_id",
+                foreignField: "createdBy",
+                as: "events",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "images",
+                            localField: "image",
+                            foreignField: "_id",
+                            as: "image",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        title: 1,
+                                        url: 1,
+                                        _id: 0
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from : "images",
+                            localField: "coverImage",
+                            foreignField: "_id",
+                            as: "coverImage",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        title: 1,
+                                        url: 1,
+                                        _id: 0
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $project: {
+                            __id: 0,
+                            description: 0,
+                            time: 0,
+                            location: 0,
+                            gallery: 0,
+                            type: 0,
+                            capacity: 0,
+                            qrCode: 0,
+                            attendees: 0,
+                            createdBy: 0,
+                            createdAt: 0,
+                            updatedAt: 0,
+                            __v: 0
+                        }
+                    },
+                    
+                ]
+            }
+        },
+        {
+            $project: {
+                __id: 0,
+                address: 0,
+                password: 0,
+                refreshToken: 0,
+                createdAt: 0,
+                updatedAt: 0,
+                __v: 0,
+                createdEvents: 0,
+                folderName: 0,
+            }
+        }
+    ]);
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, events, "Events found successfully")
+        );
+});
+
 export { 
     registerOrganizer, 
     loginOrganizer,
@@ -416,5 +504,6 @@ export {
     getCurrentOrganizer,
     updateOrganizerDetails,
     updateProfilePicture,
-    deleteOrganizer
+    deleteOrganizer,
+    getEvents
 }

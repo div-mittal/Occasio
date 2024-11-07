@@ -2,7 +2,7 @@ import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { User } from "../models/user.model.js";
 
-import { registerUser, loginUser, logoutUser, refreshAccessToken, updateUserPassword, updateUserDetails } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logoutUser, refreshAccessToken, updateUserPassword, updateUserDetails, getAttendedEvents } from "../controllers/user.controller.js";
 
 const router = Router();
 
@@ -31,6 +31,11 @@ router.route("/update-password").post(
 router.route("/update-details").patch(
     verifyJWT(User),
     updateUserDetails
+)
+
+router.route("/get-events").get(
+    verifyJWT(User),
+    getAttendedEvents
 )
 
 export default router;

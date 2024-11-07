@@ -13,7 +13,7 @@ const participantSchema = new Schema(
         },
         rsvpStatus: {
             type: String,
-            enum: ["going", "not-going", "maybe"],
+            enum: ["going", "not-going", "maybe", "checked-in"],
             default: "not-going"
         },
         badge: {
@@ -33,10 +33,13 @@ const participantSchema = new Schema(
 )
 
 participantSchema.pre("save", async function(next){
-    this.qrCode = await qrcode.toDataURL(`${this._id}`);
-    if(!this.qrCode){
+    this.qrCode = await qrcode.toDataURL(`${this._id}`)
+    .then((url) => {
+        return url;
+    })
+    .catch((err) => {
         throw new Error("QR Code generation failed");
-    }
+    })
     next();
 })
 

@@ -4,11 +4,17 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState(location.state?.role || "Attendee");
   const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch(`http://localhost:9002/api/v1/organizers/login`, {
+      const url =
+      role === "Attendee"
+        ? "http://localhost:9002/api/v1/attendees/login"
+        : "http://localhost:9002/api/v1/organizers/login";
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,11 +46,15 @@ const Login = () => {
   };
 
   return (
-    <div className='bg-blk min-h-screen flex flex-col'>
+    <div className='bg-blk text-wht min-h-screen flex flex-col'>
       <Navbar page="Login"/>
       <div className="flex-grow px-32 flex flex-row-reverse justify-center gap-[20%] items-center bg-blk text-white">
         <div className="w-full max-w-sm p-6 shadow-md rounded-lg">
-          <h1 className="text-3xl font-semibold text-center mb-6">LOGIN</h1>
+          <div className='flex justify-between items-center mb-6'>
+          <h1 className="text-3xl text-wht font-semibold text-center">LOGIN</h1>
+          <div className="text-2xl text-wht  text-center  opacity-25">{role === "Attendee" ? "Attendee" : "Organizer"}</div>
+          </div>
+          
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-300">
@@ -79,10 +89,21 @@ const Login = () => {
               Login
             </button>
           </form>
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center flex justify-between">
             <a href="#" className="text-sm text-gray-400 hover:underline">
               Forgot Password?
             </a>
+            <div className="flex gap-[6px] text-gray-400 cursor-default hover:text-wht hover:font-semibold">
+            <div>{role === "Attendee" ? "Organizer?" : "Attendee?"}</div>
+            <div
+              className="hover:text-wht cursor-pointer hover:font-normal"
+              onClick={() => {
+                setRole(role === "Attendee" ? "Organizer" : "Attendee");
+              }}
+            >
+              Click Here
+            </div>
+          </div>
           </div>
         </div>
         <img src='cal.png' alt='Calendar' className='w-2/5 xsm:hidden lg:flex' />

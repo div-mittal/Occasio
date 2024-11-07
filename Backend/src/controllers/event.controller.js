@@ -450,6 +450,7 @@ const getEventInfo = asyncHandler(async (req, res) => {
 // })
 
 const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
+    // TODO: implement capture image of the person while registering for the event and when the same person checks in the event using the qr code provided, the event coordinator gets to see the RSVP status and the image which can be used to verify if the same person is attending the event who registered in the event
     const organizerID = req.user?.id
     if(!organizerID){
         throw new ApiError(401, "Unauthorized")
@@ -485,6 +486,13 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
     if (participant.rsvpStatus != "going") {
         throw new ApiError(400, "Participant not going")
     }
+
+    if (participant,rsvpStatus == "checked-in"){
+        throw new ApiError(400, "Participant already checked in")
+    }
+
+    participant.rsvpStatus = "checked-in"
+    await participant.save({ validateBeforeSave: false })
 
     return res
     .status(200)

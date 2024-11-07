@@ -220,11 +220,92 @@ const updateUserDetails = asyncHandler(async (req, res, next) => {
     );
 })
 
+const getAttendedEvents = asyncHandler(async (req, res, next) => {
+    const user = await User.aggregate([
+        { $match: { _id: req.user._id } },
+        { 
+            $lookup: {
+                from: "events",
+                localField: "eventHistory",
+                foreignField: "_id",
+                as: "attendedEvents",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "images",
+                            localField: "image",
+                            foreignField: "_id",
+                            as: "image",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        title: 1,
+                                        url: 1,
+                                        _id: 0
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from : "images",
+                            localField: "coverImage",
+                            foreignField: "_id",
+                            as: "coverImage",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        title: 1,
+                                        url: 1,
+                                        _id: 0
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $project: {
+                            __v: 0,
+                            gallery: 0,
+                            createdAt: 0,
+                            updatedAt: 0,
+                            createdBy: 0,
+                            qrCode: 0,
+                            attendees: 0,
+                            capacity: 0,
+                            type: 0,
+                        }
+                    }
+                ]
+            }
+        },
+        { 
+            $project: {
+                attendedEvents: 1,
+                _id: 0
+            }
+        }
+    ]);
+
+    // const user = await User.findById(req.user._id).populate("eventHistory");
+
+    if(!user || user.length === 0){
+        throw new ApiError(404, "User not found");
+    }
+
+    return res
+    .status(200).json(
+        new ApiResponse(200, user, "Attended events fetched successfully")
+    );
+})
+
 export {
     registerUser,
     loginUser,
     logoutUser,
     refreshAccessToken,
     updateUserPassword,
-    updateUserDetails
+    updateUserDetails,
+    getAttendedEvents
 }
