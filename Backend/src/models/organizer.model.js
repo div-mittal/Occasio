@@ -25,6 +25,14 @@ const organizerSchema = new Schema(
             unique: true,
             trim: true
         },
+        password: {
+            type: String,
+            required: [true, "Password is required"],
+        },
+        verified: {
+            type: Boolean,
+            default: false
+        },
         address: {
             type: String
         },
@@ -36,10 +44,6 @@ const organizerSchema = new Schema(
             type: String,
             required: true
         },
-        password: {
-            type: String,
-            required: [true, "Password is required"],
-        },
         createdEvents: [
             {
                 type: Schema.Types.ObjectId,
@@ -48,7 +52,7 @@ const organizerSchema = new Schema(
         ],
         refreshToken: {
             type: String,
-        }, 
+        }
     },
     {
         timestamps: true

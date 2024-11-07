@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { registerOrganizer, loginOrganizer, logoutOrganizer, refreshAccessToken, updateOrganizerPassword, getCurrentOrganizer, updateOrganizerDetails, updateProfilePicture, deleteOrganizer, getEvents } from "../controllers/organizer.controller.js";
 import { Organizer } from "../models/organizer.model.js";
+import { verifyOrganizerMail } from "../utils/verifyMail.js";
+
+import { registerOrganizer, loginOrganizer, logoutOrganizer, refreshAccessToken, updateOrganizerPassword, getCurrentOrganizer, updateOrganizerDetails, updateProfilePicture, deleteOrganizer, getEvents } from "../controllers/organizer.controller.js";
 
 const router = Router();
 
@@ -13,6 +15,10 @@ router.route("/register").post(
 
 router.route("/login").post(
     loginOrganizer
+);
+
+router.route("/verify/:id").post(
+    verifyOrganizerMail
 );
 
 router.route("/logout").post(

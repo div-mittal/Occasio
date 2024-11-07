@@ -4,6 +4,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import { options } from "../constants.js"
 import jwt from 'jsonwebtoken';
+import sendVerificationMail from "../utils/verificationMail.js";
 
 // compare this snippet from Backend/src/controllers/organizer.controller.js:
 
@@ -47,12 +48,16 @@ const registerUser = asyncHandler(async (req, res, next) => {
         password 
     });
 
-    const { accessToken, refreshToken } = await generateAcessAndRefreshTokens(user._id);
+    if(!user){
+        throw new ApiError(500, "Failed to create user");
+    }
 
-    user.refreshToken = refreshToken;
-    user.accessToken = accessToken;
+    const mailSent = await sendVerificationMail("users", user._id, email);
 
-    await user.save({ validateBeforeSave: false });
+    if(!mailSent){
+        await User.findByIdAndDelete(user._id);
+        throw new ApiError(500, "Failed to send verification mail");
+    }
 
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
@@ -63,8 +68,6 @@ const registerUser = asyncHandler(async (req, res, next) => {
     }
 
     return res
-    .cookie("accessToken", accessToken, { options })
-    .cookie("refreshToken", refreshToken, { options })
     .status(201).json(
         new ApiResponse(201, createdUser, "User created successfully")
     );
@@ -90,6 +93,10 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
     if(!isPasswordCorrect){
         throw new ApiError(401, "Invalid email/mobile or password");
+    }
+
+    if(!user.verified){
+        throw new ApiError(402, "User Email not verified");
     }
 
     const { accessToken, refreshToken } = await generateAcessAndRefreshTokens(user._id);

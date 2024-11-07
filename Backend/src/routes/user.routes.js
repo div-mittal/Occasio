@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { User } from "../models/user.model.js";
+import { verifyUserMail } from "../utils/verifyMail.js";
 
 import { registerUser, loginUser, logoutUser, refreshAccessToken, updateUserPassword, updateUserDetails, getAttendedEvents } from "../controllers/user.controller.js";
 
@@ -8,6 +9,10 @@ const router = Router();
 
 router.route("/register").post(
     registerUser
+)
+
+router.route("/verify/:id").post(
+    verifyUserMail
 )
 
 router.route("/login").post(
