@@ -13,12 +13,25 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email:username,mobile:username, password }),
+        body: JSON.stringify({ email: username, mobile: username, password }),
       });
       const data = await response.json();
-      if(data.error){
+      if (data.error) {
         alert(data.error);
+      } else {
+        document.cookie.split(";").forEach((c) => {
+          document.cookie = c
+            .replace(/^ +/, "")
+            .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+        document.cookie = data.data.accessToken;
       }
+      console.log(document.cookie);
+      // localStorage.removeItem('organizer');
+      // // console.log(data.data.organizer);
+      // localStorage.setItem('token', JSON.stringify(data.data.organizer));
+      // const xyz = {...localStorage}
+      // console.log(xyz.token)
       navigate('/dashboard');
       
     } catch (error) {

@@ -55,10 +55,6 @@ const eventSchema = new Schema(
             type: Number,
             required: true
         },
-        genre: {
-            type: String,
-            required: true
-        },
         attendees: [
             {
                 type: Schema.Types.ObjectId,

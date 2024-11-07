@@ -5,6 +5,7 @@ import About from "./pages/About.jsx";
 import Events from "./pages/Events.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Signup from "./pages/Signup.jsx";
+import Add from "./pages/Add.jsx";
 function App() {
   return (
     <>
@@ -15,6 +16,7 @@ function App() {
         <Route path='/about' element={<About/>} />
         <Route path='/events' element={<Events/>} />
         <Route path="/dashboard" element={<Dashboard/>} />
+        <Route path='/add' element={<Add/>} />
       </Routes>
     </>
   );
