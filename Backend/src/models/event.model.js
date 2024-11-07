@@ -2,6 +2,12 @@ import mongoose, { Schema } from "mongoose"
 import { Image } from "./image.model.js"
 import qrcode from "qrcode"
 
+// TODO: give the event organizer option to enable and disable further registrations
+
+// TODO: add deadline for events and if the deadline is over close further registrations
+
+// TODO: increment capacity of event when a person registers for the event and when the current capacity is equal to the capacity of the event stop registration for the event and also implement locking when 2 or more people are registering at the same time
+
 const eventSchema = new Schema(
     {
         title: {
@@ -55,6 +61,9 @@ const eventSchema = new Schema(
             type: Number,
             required: true
         },
+        remainingCapacity: {
+            type: Number
+        },
         genre: {
             type: String,
             required: true
@@ -71,12 +80,31 @@ const eventSchema = new Schema(
         createdBy: {
             type: Schema.Types.ObjectId,
             ref: "Organiser"
+        },
+        registrationsEnabled: {
+            type: Boolean,
+            default: true
         }
     },
     {
         timestamps: true
     }
 )
+
+eventSchema.methods.registerParticipant = async function(participantId) {
+    if (!this.registrationsEnabled || this.remainingCapacity <= 0) {
+        throw new Error('Registrations are closed for this event.');
+    }
+
+    this.attendees.push(participantId);
+    this.remainingCapacity -= 1;
+
+    if (this.remainingCapacity === 0) {
+        this.registrationsEnabled = false;
+    }
+
+    await this.save();
+};
 
 eventSchema.pre('findOneAndDelete', async function (next) {
     const docToDelete = await this.model.findOne(this.getQuery());
@@ -93,6 +121,9 @@ eventSchema.pre('findOneAndDelete', async function (next) {
 });
 
 eventSchema.pre("save", async function(next){
+    if(this.isNew){
+        this.remainingCapacity = this.capacity;
+    }
     this.qrCode = await qrcode.toDataURL(`${process.env.FRONTEND_URL}/event/${this._id}`)
     .then((url) => {
         return url;

@@ -499,11 +499,43 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, participant, "Participant verified successfully"))
 })
 
+const disableRegistrations = asyncHandler(async (req, res) => {
+    const organizerID = req.user?.id
+    if(!organizerID){
+        throw new ApiError(401, "Unauthorized")
+    }
+
+    const organizer = await Organizer.findById(organizerID)
+    if (!organizer) {
+        throw new ApiError(404, "Organizer not found")
+    }
+
+    const { eventid } = req.params
+    
+    const event = await Event.findById(eventid)
+
+    if (!event) {
+        throw new ApiError(404, "Event not found")
+    }
+
+    if(event.createdBy.toString() !== organizer._id.toString()){
+        throw new ApiError(401, "Unauthorized")
+    }
+
+    event.registrationsEnabled = false
+    await event.save({ validateBeforeSave: false })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, event, "Registrations disabled successfully"))
+})
+
 export { 
     createEvent,
     updateEvent,
     removeImagesFromGallery,
     addImagesToGallery,
     getEventInfo,
-    verifyRSVPUsingQRCode
+    verifyRSVPUsingQRCode,
+    disableRegistrations
 }

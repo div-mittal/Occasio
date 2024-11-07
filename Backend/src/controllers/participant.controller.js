@@ -18,6 +18,10 @@ const checkParticipant = asyncHandler(async (req, res, next) => {
         throw new ApiError(404, "Event not found");
     }
 
+    if(!event.registrationsEnabled){
+        throw new ApiError(400, "Registrations are closed for this event");
+    }
+    
     const user = await User.findById(req.user._id);
     if(!user){
         throw new ApiError(404, "User not found");
@@ -70,10 +74,7 @@ const registerForEvent = asyncHandler(async (req, res, next) => {
         preferences
     });
 
-    event.attendees.push(participant._id);
-    await event.save({
-        validateBeforeSave: false
-    });
+    await event.registerParticipant(participant._id);
 
     user.eventHistory.push(event._id);
     await user.save({
