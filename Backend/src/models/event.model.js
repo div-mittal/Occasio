@@ -2,11 +2,7 @@ import mongoose, { Schema } from "mongoose"
 import { Image } from "./image.model.js"
 import qrcode from "qrcode"
 
-// TODO: give the event organizer option to enable and disable further registrations
-
-// TODO: add deadline for events and if the deadline is over close further registrations
-
-// TODO: increment capacity of event when a person registers for the event and when the current capacity is equal to the capacity of the event stop registration for the event and also implement locking when 2 or more people are registering at the same time
+// TODO: implement locking when 2 or more people are registering at the same time
 
 const eventSchema = new Schema(
     {
@@ -64,10 +60,6 @@ const eventSchema = new Schema(
         remainingCapacity: {
             type: Number
         },
-        genre: {
-            type: String,
-            required: true
-        },
         qrCode: {
             type: String
         },
@@ -84,6 +76,10 @@ const eventSchema = new Schema(
         registrationsEnabled: {
             type: Boolean,
             default: true
+        },
+        deadline: {
+            type: Date,
+            required: true
         }
     },
     {
@@ -92,7 +88,8 @@ const eventSchema = new Schema(
 )
 
 eventSchema.methods.registerParticipant = async function(participantId) {
-    if (!this.registrationsEnabled || this.remainingCapacity <= 0) {
+    const currentDate = new Date();
+    if (!this.registrationsEnabled || this.remainingCapacity <= 0 || currentDate > this.deadline) {
         throw new Error('Registrations are closed for this event.');
     }
 

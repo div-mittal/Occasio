@@ -16,10 +16,10 @@ const createEvent = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Organizer not found")
     }
     
-    const { title, description, date, time, location, state, city, type, capacity } = req.body
+    const { title, description, date, time, location, state, city, type, capacity, deadline } = req.body
 
     if(
-        [title, description, date, time, location, state, city, type, capacity].some((field) => field === undefined || field === "")
+        [title, description, date, time, location, state, city, type, capacity, deadline].some((field) => field === undefined || field === "")
     ){
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
@@ -30,6 +30,42 @@ const createEvent = asyncHandler(async (req, res) => {
             })
         }
         throw new ApiError(400, "All fields are required")
+    }
+
+    if(capacity <= 0){
+        fs.unlinkSync(req.files?.image[0]?.path)
+        fs.unlinkSync(req.files?.coverImage[0]?.path)
+        if(req.files?.gallery){
+            req.files.gallery.forEach((file) => {
+                fs.unlinkSync(file.path
+                )
+            })
+        }
+        throw new ApiError(400, "Capacity should be greater than 0")
+    }
+
+    if(date < new Date()){
+        fs.unlinkSync(req.files?.image[0]?.path)
+        fs.unlinkSync(req.files?.coverImage[0]?.path)
+        if(req.files?.gallery){
+            req.files.gallery.forEach((file) => {
+                fs.unlinkSync(file.path
+                )
+            })
+        }
+        throw new ApiError(400, "Date should be greater than current date")
+    }
+
+    if(deadline > date){
+        fs.unlinkSync(req.files?.image[0]?.path)
+        fs.unlinkSync(req.files?.coverImage[0]?.path)
+        if(req.files?.gallery){
+            req.files.gallery.forEach((file) => {
+                fs.unlinkSync(file.path
+                )
+            })
+        }
+        throw new ApiError(400, "Deadline should be less than date")
     }
 
     const imagePath = req.files?.image[0]?.path
@@ -77,6 +113,7 @@ const createEvent = asyncHandler(async (req, res) => {
         date,
         time,
         location,
+        deadline,
         state,
         city,
         type,
@@ -139,12 +176,30 @@ const updateEvent = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Unauthorized")
     }
 
-    const { title, description, date, time, location, state, city, type, capacity } = req.body
+    const { title, description, date, time, location, state, city, type, capacity, deadline } = req.body
 
     if(
-        [title, description, date, time, location, state, city, type, capacity].some((field) => field === undefined || field === "")
+        [title, description, date, time, location, state, city, type, capacity, deadline].some((field) => field === undefined || field === "")
     ){
         throw new ApiError(400, "All fields are required")
+    }
+
+    if(capacity <= 0){
+        fs.unlinkSync(req.files?.image[0]?.path)
+        fs.unlinkSync(req.files?.coverImage[0]?.path)
+        throw new ApiError(400, "Capacity should be greater than 0")
+    }
+
+    if(date < new Date()){
+        fs.unlinkSync(req.files?.image[0]?.path)
+        fs.unlinkSync(req.files?.coverImage[0]?.path)
+        throw new ApiError(400, "Date should be greater than current date")
+    }
+
+    if(deadline > date){
+        fs.unlinkSync(req.files?.image[0]?.path)
+        fs.unlinkSync(req.files?.coverImage[0]?.path)
+        throw new ApiError(400, "Deadline should be less than date")
     }
 
     const imagePath = req.files?.image[0]?.path
@@ -176,6 +231,8 @@ const updateEvent = asyncHandler(async (req, res) => {
         coverImage = event.coverImage;
     }
 
+    const remainingCapacity = event.remainingCapacity + (capacity - event.capacity);
+
     const updatedEvent = await Event.findByIdAndUpdate(
         eventid,
         {
@@ -187,9 +244,11 @@ const updateEvent = asyncHandler(async (req, res) => {
             state,
             city,
             type,
-            image,
-            coverImage,
-            capacity
+            image: image._id,
+            coverImage: coverImage._id,
+            capacity,
+            remainingCapacity,
+            deadline
         },
         { new: true }
     )
@@ -306,7 +365,6 @@ const addImagesToGallery = asyncHandler(async (req, res) => {
 
 const getEventInfo = asyncHandler(async (req, res) => {
     const { eventid } = req.params
-    console.log(eventid)
     const eventData = await Event.aggregate([
         {
             $match: { _id: new mongoose.Types.ObjectId(eventid) }
