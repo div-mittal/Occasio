@@ -17,7 +17,12 @@ const sendVerificationMail = async(modelType, userID, userMail) => {
     const message = `Please click the below link to verify your mail for Occasio<br><br>${button}<br><br>If the button is not working, please use the following link: <a href="${manualLink}">${manualLink}</a>`;
 
     try {
-        const mailResponse = await sendMail(userMail, "Occasio Email Verification", message, message);
+        const mailOptions = {
+            to: userMail,
+            subject: "Occasio Email Verification",
+            html: message
+        };
+        const mailResponse = await sendMail(mailOptions);
         if (mailResponse.status !== 200) {
             return false;
         }

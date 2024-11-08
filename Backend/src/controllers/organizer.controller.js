@@ -7,7 +7,7 @@ import { createFolder } from '../utils/S3Utils.js';
 import { options } from '../constants.js';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
-import sendVerificationMail from '../utils/verificationMail.js';
+import sendVerificationMail from '../utils/mailingUtils/verificationMail.js';
 
 const generateAcessAndRefreshTokens = async (organizerId) => {
     try {

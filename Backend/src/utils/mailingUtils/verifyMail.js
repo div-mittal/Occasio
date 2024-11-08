@@ -1,12 +1,11 @@
-import { User } from "../models/user.model.js";
-import { Organizer } from "../models/organizer.model.js";
-import { ApiResponse } from "./ApiResponse.js";
-import { ApiError } from "./ApiError.js";
+import { User } from "../../models/user.model.js";
+import { Organizer } from "../../models/organizer.model.js";
+import { ApiResponse } from "../ApiResponse.js";
+import { ApiError } from "../ApiError.js";
 
 
 const verifyMail = (model) => async (req, res, next) => {
     const { id } = req.params;
-    console.log(id, model)
     try {
         const user = await model.findById(id);
         if (!user) {

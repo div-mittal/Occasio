@@ -2,7 +2,7 @@ import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { Organizer } from "../models/organizer.model.js";
-import { verifyOrganizerMail } from "../utils/verifyMail.js";
+import { verifyOrganizerMail } from "../utils/mailingUtils/verifyMail.js";
 
 import { registerOrganizer, loginOrganizer, logoutOrganizer, refreshAccessToken, updateOrganizerPassword, getCurrentOrganizer, updateOrganizerDetails, updateProfilePicture, deleteOrganizer, getEvents } from "../controllers/organizer.controller.js";
 

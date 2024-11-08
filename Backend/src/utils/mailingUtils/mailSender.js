@@ -12,15 +12,9 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-export const sendMail = async (to, subject, text, html) => {
+export const sendMail = async (mailOptions) => {
     try {
-        const mailOptions = {
-            from: process.env.MAIL_USERNAME,
-            to,
-            subject,
-            text,
-            html
-        };
+        mailOptions.from = process.env.MAIL_USERNAME;
         await transporter.sendMail(mailOptions);
         return { status: 200, message: 'Mail sent successfully' };
     } catch (error) {

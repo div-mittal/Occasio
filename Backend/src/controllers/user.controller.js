@@ -4,7 +4,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import { options } from "../constants.js"
 import jwt from 'jsonwebtoken';
-import sendVerificationMail from "../utils/verificationMail.js";
+import sendVerificationMail from "../utils/mailingUtils/verificationMail.js";
 
 // compare this snippet from Backend/src/controllers/organizer.controller.js:
 

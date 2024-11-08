@@ -4,7 +4,30 @@ import { User } from "../models/user.model.js";
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
+import { sendMail } from "../utils/mailingUtils/mailSender.js";
 
+const sendRegistrationMail = async (participant) => {
+    const event = await Event.findById(participant.event);
+    const user = await User.findById(participant.user);
+
+    const eventDate = new Date(event.date);
+    const eventDateString = eventDate.toLocaleDateString();
+    const eventTimeString = eventDate.toLocaleTimeString();
+
+    const message = `Hello ${user.name},<br><br>You have successfully registered for the event ${event.name}.<br><br>Event Details:<br>Date: ${eventDateString}<br>Time: ${eventTimeString}<br>Venue: ${event.location}<br>City: ${event.city}<br>State: ${event.state}<br><br>Badge: ${participant.badge}<br>Preferences: ${participant.preferences}<br><br>Thank you for registering for the event. We look forward to seeing you there.<br><br>Regards,<br>Occasio Team`;
+
+    const mailOptions = {
+        to: user.email,
+        subject: `Registration for ${event.title} Successful`,
+        html: message
+    };
+
+    const mailResponse = await sendMail(mailOptions);
+
+    if(mailResponse.status !== 200){
+        throw new ApiError(500, "Failed to send registration mail");
+    }
+}
 
 const checkParticipant = asyncHandler(async (req, res, next) => {
     const { eventID } = req.params;
@@ -80,6 +103,8 @@ const registerForEvent = asyncHandler(async (req, res, next) => {
     await user.save({
         validateBeforeSave: false
     });
+
+    await sendRegistrationMail(participant);
 
     const createdParticipant = await Participant.aggregate([
         {
