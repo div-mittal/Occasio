@@ -2,6 +2,8 @@ import mongoose, { Schema } from "mongoose"
 import { Image } from "./image.model.js"
 import qrcode from "qrcode"
 
+// TODO: implement locking when 2 or more people are registering at the same time
+
 const eventSchema = new Schema(
     {
         title: {
@@ -14,10 +16,6 @@ const eventSchema = new Schema(
         },
         date: {
             type: Date,
-            required: true
-        },
-        time: {
-            type: String,
             required: true
         },
         location: {
@@ -55,6 +53,9 @@ const eventSchema = new Schema(
             type: Number,
             required: true
         },
+        remainingCapacity: {
+            type: Number
+        },
         qrCode: {
             type: String
         },
@@ -67,12 +68,36 @@ const eventSchema = new Schema(
         createdBy: {
             type: Schema.Types.ObjectId,
             ref: "Organiser"
+        },
+        registrationsEnabled: {
+            type: Boolean,
+            default: true
+        },
+        deadline: {
+            type: Date,
+            required: true
         }
     },
     {
         timestamps: true
     }
 )
+
+eventSchema.methods.registerParticipant = async function(participantId) {
+    const currentDate = new Date();
+    if (!this.registrationsEnabled || this.remainingCapacity <= 0 || currentDate > this.deadline) {
+        throw new Error('Registrations are closed for this event.');
+    }
+
+    this.attendees.push(participantId);
+    this.remainingCapacity -= 1;
+
+    if (this.remainingCapacity === 0) {
+        this.registrationsEnabled = false;
+    }
+
+    await this.save();
+};
 
 eventSchema.pre('findOneAndDelete', async function (next) {
     const docToDelete = await this.model.findOne(this.getQuery());
@@ -89,6 +114,9 @@ eventSchema.pre('findOneAndDelete', async function (next) {
 });
 
 eventSchema.pre("save", async function(next){
+    if(this.isNew){
+        this.remainingCapacity = this.capacity;
+    }
     this.qrCode = await qrcode.toDataURL(`${process.env.FRONTEND_URL}/event/${this._id}`)
     .then((url) => {
         return url;

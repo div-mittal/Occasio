@@ -7,6 +7,7 @@ import { createFolder } from '../utils/S3Utils.js';
 import { options } from '../constants.js';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
+import sendVerificationMail from '../utils/mailingUtils/verificationMail.js';
 
 const generateAcessAndRefreshTokens = async (organizerId) => {
     try {
@@ -76,11 +77,13 @@ const registerOrganizer = asyncHandler(async (req, res) => {
         password,
         address : address || ""
     });
-    
-    const { accessToken, refreshToken } = await generateAcessAndRefreshTokens(organizer._id);
-    
-    organizer.refreshToken = refreshToken;
-    await organizer.save({ validateBeforeSave: false });
+
+    const mailSent = await sendVerificationMail("organizers", organizer._id, email);
+
+    if(!mailSent){
+        await Organizer.findByIdAndDelete(organizer._id);
+        throw new ApiError(500, "Failed to send verification mail");
+    }
 
     const createdOrganizer = await Organizer.findById(organizer._id).select(
         "-password -refreshToken"
@@ -91,11 +94,10 @@ const registerOrganizer = asyncHandler(async (req, res) => {
     }
 
     return res
-    .cookie("accessToken", accessToken, {options})
-    .cookie("refreshToken", refreshToken, {options})
-    .status(201).json(
-        new ApiResponse(201, createdOrganizer, "Organizer registered successfully")
-    )
+    .status(201)
+    .json(
+        new ApiResponse(201, createdOrganizer, "Organizer created successfully")
+    );
 });
 
 const loginOrganizer = asyncHandler(async (req, res) => {
@@ -123,6 +125,10 @@ const loginOrganizer = asyncHandler(async (req, res) => {
 
     if (!isPasswordCorrect) {
         throw new ApiError(401, "Invalid organizer credentials");
+    }
+
+    if(!organizer.verified){
+        throw new ApiError(402, "Organizer Email not verified");
     }
 
     // generate access and refresh token

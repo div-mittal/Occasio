@@ -26,6 +26,10 @@ const userSchema = new Schema(
             type: String,
             required: [true, "Password is required"],
         },
+        verified: {
+            type: Boolean,
+            default: false,
+        },
         eventHistory: [
             {
                 type: Schema.Types.ObjectId,
