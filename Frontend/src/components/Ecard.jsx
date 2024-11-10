@@ -2,7 +2,7 @@ import React from 'react'
 
 const Ecard = (props) => {
 return (
-    <div className='h-full bg-[url("C:\Users\jasin\Documents\Occasio\Frontend\src\components\image.png")] bg-cover bg-center min-w-[20%] bg-opacity-70 bg-white flex flex-col justify-between items-center rounded-md' >
+    <div className='h-full bg-[url("/image.png")] bg-cover bg-center min-w-[20%] bg-opacity-70 bg-white flex flex-col justify-between items-center rounded-md' >
         <div className='flex flex-col justify-between h-full w-full p-2'>
             <div className='flex flex-row-reverse'>
                 <div className='flex flex-col items-center border-2 rounded-sm px-2 bg-blk bg-opacity-15'>

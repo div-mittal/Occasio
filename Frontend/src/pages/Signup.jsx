@@ -34,7 +34,7 @@ const Signup = () => {
 
     const url =
       role === "Attendee"
-        ? "http://localhost:9002/api/v1/attendees/register"
+        ? "http://localhost:9002/api/v1/users/register"
         : "http://localhost:9002/api/v1/organizers/register";
 
     fetch(url, {
@@ -52,7 +52,7 @@ const Signup = () => {
       })
       .catch((err) => {
         console.log(err);
-        message.error("An error occurred. Please try again later.");
+        message.error(err.message);
       });
   };
 

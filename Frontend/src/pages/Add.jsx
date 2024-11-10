@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
+import { message } from "antd";
 
 const Add = () => {
     const [title, setTitle] = useState("");
@@ -50,6 +51,7 @@ const Add = () => {
                 console.error("Failed to register event:", response.statusText);
             }
         } catch (error) {
+            message.error(error)
             console.error("Error:", error);
         }
     };
@@ -67,7 +69,7 @@ const Add = () => {
     return (
         <div className="flex flex-col min-h-[100vh] bg-blk">
             <Navbar />
-            <div className="w-full px-20 py-8 flex-grow"></div>
+            <div className="w-full px-20 py-8 flex-grow">
                 <div className="flex flex-col w-full h-full p-6 border border-solid border-wht border-opacity-25 rounded-lg ">
                     <h1 className="text-wht text-2xl mb-4">Add Event</h1>
                     <div className="flex flex-col gap-4 md:flex-row">
@@ -163,7 +165,7 @@ const Add = () => {
                                         htmlFor="image"
                                         className="w-full lg:w-[100%] cursor-pointer flex items-center justify-center bg-ylw hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded-sm transition duration-300 ease-in-out"
                                     >
-                                        Select Event Picture
+                                        {(!image)?`Select Event Picture`:`Picture Uploaded`}
                                     </label>
                                     <input
                                         id="image"
@@ -178,7 +180,7 @@ const Add = () => {
                                         htmlFor="coverImage"
                                         className="w-full lg:w-[100%] cursor-pointer flex items-center justify-center bg-ylw hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded-sm transition duration-300 ease-in-out"
                                     >
-                                        Select Cover Picture
+                                        {(!coverImage)?`Select Cover Picture`:`Cover Uploaded`}
                                     </label>
                                     <input
                                         id="coverImage"
@@ -193,7 +195,7 @@ const Add = () => {
                                         htmlFor="gallery"
                                         className="w-full lg:w-[100%] cursor-pointer flex items-center justify-center bg-ylw hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded-sm transition duration-300 ease-in-out"
                                     >
-                                        Select Gallery Pictures
+                                        {(gallery.length==0)?`Select Gallery Pictures`:`Gallery Pics Uploaded`}
                                     </label>
                                     <input
                                         id="gallery"
@@ -216,6 +218,7 @@ const Add = () => {
                     >
                         Register Event
                     </button>
+                </div>
                 </div>
             </div>
     );
