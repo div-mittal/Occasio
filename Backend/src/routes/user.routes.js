@@ -11,7 +11,7 @@ router.route("/register").post(
     registerUser
 )
 
-router.route("/verify/:id").post(
+router.route("/verify/:id").get(
     verifyUserMail
 )
 

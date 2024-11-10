@@ -17,7 +17,7 @@ router.route("/login").post(
     loginOrganizer
 );
 
-router.route("/verify/:id").post(
+router.route("/verify/:id").get(
     verifyOrganizerMail
 );
 
