@@ -5,16 +5,18 @@ import { asyncHandler } from '../utils/asyncHandler.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import { sendMail } from "../utils/mailingUtils/mailSender.js";
+import { Organizer } from "../models/organizer.model.js";
 
 const sendRegistrationMail = async (participant) => {
     const event = await Event.findById(participant.event);
     const user = await User.findById(participant.user);
+    const organizer = await Organizer.findById(event.createdBy)
 
     const eventDate = new Date(event.date);
     const eventDateString = eventDate.toLocaleDateString();
     const eventTimeString = eventDate.toLocaleTimeString();
 
-    const message = `Hello ${user.name},<br><br>You have successfully registered for the event ${event.name}.<br><br>Event Details:<br>Date: ${eventDateString}<br>Time: ${eventTimeString}<br>Venue: ${event.location}<br>City: ${event.city}<br>State: ${event.state}<br><br>Badge: ${participant.badge}<br>Preferences: ${participant.preferences}<br><br>Thank you for registering for the event. We look forward to seeing you there.<br><br>Regards,<br>Occasio Team`;
+    const message = `Hello ${user.name},<br><br>You have successfully registered for the event ${event.name}.<br><br>Event Details:<br>Date: ${eventDateString}<br>Time: ${eventTimeString}<br>Venue: ${event.location}<br>City: ${event.city}<br>State: ${event.state}<br><br>Badge: ${participant.badge}<br>Preferences: ${participant.preferences}<br><br>Thank you for registering for the event. We look forward to seeing you there.<br><br>Regards,<br>${organizer.name}`;
 
     const mailOptions = {
         to: user.email,

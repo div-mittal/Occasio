@@ -16,7 +16,7 @@ const scheduleEventReminder = async (event) => {
     reminderTime.setMinutes(reminderTime.getMinutes() - 30)
 
     schedule.scheduleJob(reminderTime, async () => {
-        const participants = await Participant.find({ event: event._id })
+        const participants = await Participant.find({ event: event._id, rsvpStatus: "going" });
         if (participants.length > 0) {
             const participantEmails = await Promise.all(participants.map(async participant => {
                 const user = await User.findById(participant.user);
