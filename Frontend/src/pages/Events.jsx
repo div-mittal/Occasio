@@ -1,14 +1,15 @@
 import Navbar from "../components/Navbar";
+import Scard from "../components/Scard";
 
 const Events = () => {
+    const events=[]
     return (
         <div className="bg-blk h-screen">
             <Navbar page="Events" />
-            <div className="content h-[85vh] flex flex-col justify-center items-center">
-                <div className="flex flex-col gap-6 items-center">
-                    <h1 className="text-wht text-xl">Events will be shown here</h1>
-                    <img src='OCCASIO.png'/>
-                </div>
+            <div className="content h-[85vh] flex flex-wrap py-12 px-2 gap-8 justify-center overflow-auto">
+                <Scard/>
+                <Scard/>
+                <Scard/><Scard/><Scard/><Scard/><Scard/><Scard/><Scard/><Scard/><Scard/>
             </div>
         </div>
     );
