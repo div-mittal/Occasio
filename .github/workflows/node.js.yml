@@ -1,15 +1,16 @@
-name: Backend CI/CD
+name: Node.js CI/CD
 
 on:
   push:
     branches: [ "main" ]
     paths:
-      - 'backend/**'
+      - 'Backend/**'
+      - '.github/workflows/node.js.yml'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'backend/**'
-
+      - 'Backend/**'
+      - '.github/workflows/node.js.yml'
 
 jobs:
   build:
