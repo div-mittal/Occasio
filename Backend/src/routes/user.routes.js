@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {upload} from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { User } from "../models/user.model.js";
 import { verifyUserMail } from "../utils/mailingUtils/verifyMail.js";
@@ -8,6 +9,7 @@ import { registerUser, loginUser, logoutUser, refreshAccessToken, updateUserPass
 const router = Router();
 
 router.route("/register").post(
+    upload.single("profilePicture"),
     registerUser
 )
 

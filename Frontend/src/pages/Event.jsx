@@ -1,16 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router-dom";
 import RSVP from "../components/RSVP.jsx";
-import { useState } from "react";
+
 const EventDetails = ({ event }) => {
-  const [user, setUser] = useState("organizer"); // Example: Default set as "organizer" for testing
+  const [user, setUser] = useState("Attendee"); // Example: Default set as "organizer" for testing
   const [editableEvent, setEditableEvent] = useState(event);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedRole = localStorage.getItem("role");
+    if (savedRole) {
+      setUser(savedRole);
+    }
+  }, []);
 
   const handleInputChange = (field, value) => {
     setEditableEvent({ ...editableEvent, [field]: value });
   };
+
   const handleConfirm = () => {
     // Implement the RSVP functionality here
     console.log("RSVP Confirmed");
@@ -59,7 +67,7 @@ const EventDetails = ({ event }) => {
                         </label>
                         <input
                           type="text"
-                          value="editableEvent.title"
+                          value={editableEvent.title}
                           onChange={(e) =>
                             handleInputChange("title", e.target.value)
                           }
@@ -72,7 +80,7 @@ const EventDetails = ({ event }) => {
                         </label>
                         <input
                           type="text"
-                          value="editableEvent.location"
+                          value={editableEvent.location}
                           onChange={(e) =>
                             handleInputChange("location", e.target.value)
                           }
@@ -86,7 +94,7 @@ const EventDetails = ({ event }) => {
                           </label>
                           <input
                             type="date"
-                            value="editableEvent.date"
+                            value={editableEvent.date}
                             onChange={(e) =>
                               handleInputChange("date", e.target.value)
                             }
@@ -99,7 +107,7 @@ const EventDetails = ({ event }) => {
                           </label>
                           <input
                             type="time"
-                            value="editableEvent.time"
+                            value={editableEvent.time}
                             onChange={(e) =>
                               handleInputChange("time", e.target.value)
                             }
@@ -138,8 +146,8 @@ const EventDetails = ({ event }) => {
 
               <div className="flex flex-col w-2/3 justify-between">
                 <div>
-                  <h1 className="text-wht text-6xl font-bold">event.title</h1>
-                  <p className="text-wht text-lg">event.location</p>
+                  <h1 className="text-wht text-6xl font-bold">editableEvent.title</h1>
+                  <p className="text-wht text-lg">editableEvent.location</p>
                 </div>
                 <div className="mt-4">
                   <h2 className="text-wht text-xl font-semibold">
@@ -152,17 +160,17 @@ const EventDetails = ({ event }) => {
 
                 <div className="flex flex-row gap-8 mt-4">
                   <div className="flex flex-col items-center justify-center border border-solid border-wht border-opacity-25 rounded-lg p-4">
-                    <h3 className="text-wht text-2xl">event.date</h3>
+                    <h3 className="text-wht text-2xl">editableEvent.date</h3>
                     <p className="text-wht text-lg">Dec</p>
                   </div>
 
                   <div className="flex flex-col items-center justify-center border border-solid border-wht border-opacity-25 rounded-lg p-4">
-                    <h3 className="text-wht text-2xl">event.time</h3>
+                    <h3 className="text-wht text-2xl">editableEvent.time</h3>
                     <p className="text-wht text-lg">onwards</p>
                   </div>
                 </div>
               </div>
-              <RSVP handleConfirm />
+              <RSVP handleConfirm={handleConfirm} />
             </div>
           )}
         </div>

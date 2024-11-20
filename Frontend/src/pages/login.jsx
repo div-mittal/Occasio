@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -11,7 +12,7 @@ const Login = () => {
     try {
       const url =
       role === "Attendee"
-        ? "http://localhost:9002/api/v1/attendees/login"
+        ? "http://localhost:9002/api/v1/users/login"
         : "http://localhost:9002/api/v1/organizers/login";
 
       const response = await fetch(url, {
@@ -21,25 +22,20 @@ const Login = () => {
         },
         body: JSON.stringify({ email: username, mobile: username, password }),
       });
+      console.log(response)
+      if(!response.ok){
+        message.error(response.statusText);
+        return;
+      }
       const data = await response.json();
-      if (data.error) {
-        alert(data.error);
-      } else {
         document.cookie.split(";").forEach((c) => {
           document.cookie = c
             .replace(/^ +/, "")
             .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
         });
         document.cookie = data.data.accessToken;
-      }
-      console.log(document.cookie);
-      // localStorage.removeItem('organizer');
-      // // console.log(data.data.organizer);
-      // localStorage.setItem('token', JSON.stringify(data.data.organizer));
-      // const xyz = {...localStorage}
-      // console.log(xyz.token)
+        localStorage.setItem('role', role);
       navigate('/dashboard');
-      
     } catch (error) {
       console.error('Error logging in:', error);
     }

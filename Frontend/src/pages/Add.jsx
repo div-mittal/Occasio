@@ -31,7 +31,7 @@ const Add = () => {
         if (image) formData.append("image", image);
         if (coverImage) formData.append("coverImage", coverImage);
         if (gallery) formData.append("gallery", gallery);
-
+        console.log(formData)
         try {
             const response = await fetch(
                 "http://localhost:9002/api/v1/events/create",
