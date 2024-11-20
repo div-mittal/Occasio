@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 // routes import
 import organizerRouter from "./routes/organizer.routes.js";
@@ -31,5 +32,7 @@ app.use(cookieParser());
 app.use("/api/v1/organizers", organizerRouter);
 app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/users", userRoutes);
+
+app.use(errorHandler);
 
 export { app }
