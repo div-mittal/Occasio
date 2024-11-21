@@ -200,6 +200,7 @@ const createEvent = asyncHandler(async (req, res) => {
 })
 
 const updateEvent = asyncHandler(async (req, res) => {
+    console.log(req.body)
     const organizer = await Organizer.findById(req.user?.id)
     if (!organizer) {
         throw new ApiError(404, "Organizer not found")
@@ -215,7 +216,7 @@ const updateEvent = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Unauthorized")
     }
 
-    const { title, description, date, time, location, state, city, type, capacity, deadline, deadlineTime } = req.body
+    const { title, description, date, time, location, state, city, type, capacity} = req.body
 
     // convert the incoming time to date and append it with the date of the event
     const eventDateTime = new Date(date);

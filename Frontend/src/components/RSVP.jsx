@@ -1,7 +1,18 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
+import { message } from "antd";
+
 const RSVP = (props) => {
+  const navigate=useNavigate();
   const [confirm, setConfirm] = useState(false);
+  const handleConfirm = () => {
+    if(!localStorage.username){
+      message.error("Login First");
+      navigate('/login');
+    }
+  }
+
   return (
     <>
       <div className="flex flex-col items-start w-1/3 justify-between border border-solid border-wht border-opacity-25 rounded-lg p-6">
@@ -13,7 +24,7 @@ const RSVP = (props) => {
               look forward to joining you.
             </p>
             <button
-              onClick={() => setConfirm(true)}
+              onClick={() => handleConfirm()}
               className="bg-ylw text-blk text-lg w-full font-bold rounded-md px-6 py-2 hover:cursor-pointer"
             >
               Confirm
