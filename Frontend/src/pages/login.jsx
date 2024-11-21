@@ -10,50 +10,46 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-        const url =
-            role === "Attendee"
-                ? "http://localhost:9002/api/v1/users/login"
-                : "http://localhost:9002/api/v1/organizers/login";
+      const url =
+        role === "Attendee"
+          ? "http://localhost:9002/api/v1/users/login"
+          : "http://localhost:9002/api/v1/organizers/login";
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: username, mobile: username, password }),
-            credentials: 'include', // Include cookies in the response
-        });
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: username, mobile: username, password }),
+        credentials: 'include', // Include cookies in the response
+      });
 
-        if (!response.ok) {
-            message.error(response.statusText);
-            return;
-        }
-
-        const data = await response.json();
-        console.log(data);
-
-        // Store additional information as needed
+      const data = await response.json();
+      console.log(data);
+      if (data.statusCode !== 200) {
+        message.error(data.message);
+      } else {
+        message.success(data.message);
         localStorage.setItem('role', role);
-        localStorage.setItem('username', username);
-
-        // Navigate to the dashboard
+        localStorage.setItem('username', username)
         navigate('/dashboard');
+      }
     } catch (error) {
-        console.error('Error logging in:', error);
+      console.error('Error logging in:', error);
     }
   };
 
 
   return (
     <div className='bg-blk text-wht min-h-screen flex flex-col'>
-      <Navbar page="Login"/>
+      <Navbar page="Login" />
       <div className="flex-grow px-32 flex flex-row-reverse justify-center gap-[20%] items-center bg-blk text-white">
         <div className="w-full max-w-sm p-6 shadow-md rounded-lg">
           <div className='flex justify-between items-center mb-6'>
-          <h1 className="text-3xl text-wht font-semibold text-center">LOGIN</h1>
-          <div className="text-2xl text-wht  text-center  opacity-25">{role === "Attendee" ? "Attendee" : "Organizer"}</div>
+            <h1 className="text-3xl text-wht font-semibold text-center">LOGIN</h1>
+            <div className="text-2xl text-wht  text-center  opacity-25">{role === "Attendee" ? "Attendee" : "Organizer"}</div>
           </div>
-          
+
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-300">
@@ -93,16 +89,16 @@ const Login = () => {
               Forgot Password?
             </a>
             <div className="flex gap-[6px] text-gray-400 cursor-default hover:text-wht hover:font-semibold">
-            <div>{role === "Attendee" ? "Organizer?" : "Attendee?"}</div>
-            <div
-              className="hover:text-wht cursor-pointer hover:font-normal"
-              onClick={() => {
-                setRole(role === "Attendee" ? "Organizer" : "Attendee");
-              }}
-            >
-              Click Here
+              <div>{role === "Attendee" ? "Organizer?" : "Attendee?"}</div>
+              <div
+                className="hover:text-wht cursor-pointer hover:font-normal"
+                onClick={() => {
+                  setRole(role === "Attendee" ? "Organizer" : "Attendee");
+                }}
+              >
+                Click Here
+              </div>
             </div>
-          </div>
           </div>
         </div>
         <img src='cal.png' alt='Calendar' className='w-2/5 xsm:hidden lg:flex' />

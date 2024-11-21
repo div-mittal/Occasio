@@ -4,7 +4,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { Organizer } from "../models/organizer.model.js";
 import { User } from "../models/user.model.js";
 
-import { createEvent, updateEvent, removeImagesFromGallery, addImagesToGallery, getEventInfo, verifyRSVPUsingQRCode, disableRegistrations, sendRSVPMailsToParticipants } from "../controllers/event.controller.js";
+import { createEvent, updateEvent, removeImagesFromGallery, addImagesToGallery, getEventInfo, verifyRSVPUsingQRCode, disableRegistrations, getAllOpenEvents, sendRSVPMailsToParticipants, sendMailToParticipants } from "../controllers/event.controller.js";
 import { registerForEvent, checkParticipant, updateDetails, unregisterFromEvent, updateRSVPStatus } from "../controllers/participant.controller.js";
 
 
@@ -61,6 +61,11 @@ router.route("/verify-rsvp/:eventid").post(
     verifyRSVPUsingQRCode
 );
 
+router.route("/send-mail/:eventid").post(
+    verifyJWT(Organizer),
+    sendMailToParticipants
+);
+
 router.route("/register/:eventID").post(
     verifyJWT(User),
     registerForEvent
@@ -84,6 +89,11 @@ router.route("/unregister/:eventID").delete(
 router.route("/update-rsvp/:eventID").put(
     verifyJWT(User),
     updateRSVPStatus
+);
+
+router.route("/open").get(
+    verifyJWT(User),
+    getAllOpenEvents
 );
 
 export default router;

@@ -43,8 +43,9 @@ const Signup = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.error) {
-          message.error(data.error);
+        console.log(data)
+        if (data.statusCode != 201) {
+          message.error(data.message);
         } else {
           message.success(data.message);
           navigate("/login");
