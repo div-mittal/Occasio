@@ -7,10 +7,10 @@ import { User } from "../models/user.model.js";
 export const verifyJWT = (model) => asyncHandler(async (req, res, next) => {
     try {
         // Extract token from cookies or Authorization header
-        const token = req.cookies?.accessToken || 
-                      (req.headers.authorization?.startsWith("Bearer ") 
-                       ? req.headers.authorization.split(" ")[1] 
-                       : null);
+        const token = req.cookies?.accessToken ||
+            (req.headers.authorization?.startsWith("Bearer ")
+                ? req.headers.authorization.split(" ")[1]
+                : null);
 
         if (!token) {
             console.log("Token not provided");

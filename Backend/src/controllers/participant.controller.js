@@ -26,29 +26,29 @@ const sendRegistrationMail = async (participant) => {
 
     const mailResponse = await sendMail(mailOptions);
 
-    if(mailResponse.status !== 200){
+    if (mailResponse.status !== 200) {
         throw new ApiError(500, "Failed to send registration mail");
     }
 }
 
 const checkParticipant = asyncHandler(async (req, res, next) => {
     const { eventID } = req.params;
-    if(!eventID){
+    if (!eventID) {
         throw new ApiError(400, "Event ID is required");
     }
 
     const event = await Event.findById(eventID);
 
-    if(!event){
+    if (!event) {
         throw new ApiError(404, "Event not found");
     }
 
-    if(!event.registrationsEnabled){
+    if (!event.registrationsEnabled) {
         throw new ApiError(400, "Registrations are closed for this event");
     }
-    
+
     const user = await User.findById(req.user._id);
-    if(!user){
+    if (!user) {
         throw new ApiError(404, "User not found");
     }
 
@@ -57,14 +57,14 @@ const checkParticipant = asyncHandler(async (req, res, next) => {
         event: event._id
     });
 
-    if(!participant){
+    if (!participant) {
         throw new ApiError(404, "User not registered for event");
     }
 
     return res
-    .status(200).json(
-        new ApiResponse(200, participant, "Participant found")
-    );
+        .status(200).json(
+            new ApiResponse(200, participant, "Participant found")
+        );
 
 })
 
@@ -74,21 +74,21 @@ const registerForEvent = asyncHandler(async (req, res, next) => {
 
     const event = await Event.findById(eventID);
 
-    if(!event){
+    if (!event) {
         throw new ApiError(404, "Event not found");
     }
 
     const user = await User.findById(req.user._id);
 
-    if(!user){
+    if (!user) {
         throw new ApiError(404, "User not found");
     }
 
     const existingParticipant = await Participant.findOne(
-        {user: user._id, event: event._id}
+        { user: user._id, event: event._id }
     );
 
-    if(existingParticipant){
+    if (existingParticipant) {
         throw new ApiError(400, "User already registered for event");
     }
 
@@ -166,14 +166,14 @@ const registerForEvent = asyncHandler(async (req, res, next) => {
         },
     ]);
 
-    if(!createdParticipant){
+    if (!createdParticipant) {
         throw new ApiError(500, "Failed to register for event");
     }
 
     return res
-    .status(201).json(
-        new ApiResponse(201, createdParticipant, "Registered for event successfully")
-    );
+        .status(201).json(
+            new ApiResponse(201, createdParticipant, "Registered for event successfully")
+        );
 })
 
 const updateDetails = asyncHandler(async (req, res, next) => {
@@ -182,26 +182,26 @@ const updateDetails = asyncHandler(async (req, res, next) => {
 
     const event = await Event.findById(eventID);
 
-    if(!event){
+    if (!event) {
         throw new ApiError(404, "Event not found");
     }
 
     const user = await User.findById(req.user._id);
 
-    if(!user){
+    if (!user) {
         throw new ApiError(404, "User not found");
     }
 
     const participant = await Participant.findOneAndUpdate(
-        {user: user._id, event: event._id},
-        {badge, preferences},
-        {new: true}
+        { user: user._id, event: event._id },
+        { badge, preferences },
+        { new: true }
     );
 
     return res
-    .status(200).json(
-        new ApiResponse(200, participant, "Participant details updated successfully")
-    );
+        .status(200).json(
+            new ApiResponse(200, participant, "Participant details updated successfully")
+        );
 })
 
 const unregisterFromEvent = asyncHandler(async (req, res, next) => {
@@ -209,13 +209,13 @@ const unregisterFromEvent = asyncHandler(async (req, res, next) => {
 
     const event = await Event.findById(eventID);
 
-    if(!event){
+    if (!event) {
         throw new ApiError(404, "Event not found");
     }
 
     const user = await User.findById(req.user._id);
 
-    if(!user){
+    if (!user) {
         throw new ApiError(404, "User not found");
     }
 
@@ -224,7 +224,7 @@ const unregisterFromEvent = asyncHandler(async (req, res, next) => {
         event: event._id
     });
 
-    if(!participant){
+    if (!participant) {
         throw new ApiError(404, "User not registered for event");
     }
 
@@ -245,9 +245,9 @@ const unregisterFromEvent = asyncHandler(async (req, res, next) => {
     });
 
     return res
-    .status(200).json(
-        new ApiResponse(200, {}, "Unregistered from event successfully")
-    );
+        .status(200).json(
+            new ApiResponse(200, {}, "Unregistered from event successfully")
+        );
 })
 
 const updateRSVPStatus = asyncHandler(async (req, res, next) => {
@@ -256,26 +256,26 @@ const updateRSVPStatus = asyncHandler(async (req, res, next) => {
 
     const event = await Event.findById(eventID);
 
-    if(!event){
+    if (!event) {
         throw new ApiError(404, "Event not found");
     }
 
     const user = await User.findById(req.user._id);
 
-    if(!user){
+    if (!user) {
         throw new ApiError(404, "User not found");
     }
 
     const participant = await Participant.findOneAndUpdate(
-        {user: user._id, event: event._id},
-        {rsvpStatus},
-        {new: true}
+        { user: user._id, event: event._id },
+        { rsvpStatus },
+        { new: true }
     );
 
     return res
-    .status(200).json(
-        new ApiResponse(200, participant, "RSVP status updated successfully")
-    );
+        .status(200).json(
+            new ApiResponse(200, participant, "RSVP status updated successfully")
+        );
 })
 
 

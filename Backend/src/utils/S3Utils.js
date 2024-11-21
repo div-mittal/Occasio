@@ -2,6 +2,7 @@ import AWS from 'aws-sdk';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import mime from 'mime';
 dotenv.config();
 
 
@@ -13,28 +14,46 @@ AWS.config.update({
 const s3 = new AWS.S3();
 
 const uploadFile = async (localFilePath, folderName) => {
-    try{
-        if(!localFilePath){
+    try {
+        if (!localFilePath) {
             return null;
         }
-        const fileContent = fs.readFileSync(localFilePath);
-        const imageType = path.extname(localFilePath);
-        const imageName = path.basename(localFilePath).toLowerCase().split(" ").join("-").split(".").join("-") + "-" + Date.now() + imageType;
 
+        // Read file content
+        const fileContent = fs.readFileSync(localFilePath);
+
+        // Get the MIME type of the file based on its extension
+        const imageType = mime.getType(localFilePath);  
+        if (!imageType) {
+            throw new Error("Unsupported file type");
+        }
+
+        // Create a new image name with a timestamp
+        const imageName = path.basename(localFilePath).toLowerCase()
+            .split(" ").join("-")
+            .split(".").join("-") + "-" + Date.now() + path.extname(localFilePath);
+
+        // S3 upload parameters
         const params = {
             Bucket: process.env.AWS_BUCKET_NAME,
             Key: folderName + "/" + imageName,
-            Body: fileContent
+            Body: fileContent,
+            ContentType: imageType,  // Set the Content-Type
+            ContentDisposition: "inline",  // Set the Content-Disposition
         };
+
+        // Upload the file to S3
         const result = await s3.upload(params).promise();
+
+        // Delete the local file after upload
         fs.unlinkSync(localFilePath);
-        return result.Location;
-    }
-    catch(error){
+
+        return result.Location;  // Return the S3 URL of the uploaded file
+    } catch (error) {
         console.log(error);
         return null;
     }
-}
+};
 
 const deleteFile = async (key, folderName) => {
     const imageKey = key.split("/").pop();

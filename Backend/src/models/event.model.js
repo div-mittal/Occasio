@@ -83,7 +83,7 @@ const eventSchema = new Schema(
     }
 )
 
-eventSchema.methods.registerParticipant = async function(participantId) {
+eventSchema.methods.registerParticipant = async function (participantId) {
     const currentDate = new Date();
     if (!this.registrationsEnabled || this.remainingCapacity <= 0 || currentDate > this.deadline) {
         throw new Error('Registrations are closed for this event.');
@@ -113,17 +113,17 @@ eventSchema.pre('findOneAndDelete', async function (next) {
     next();
 });
 
-eventSchema.pre("save", async function(next){
-    if(this.isNew){
+eventSchema.pre("save", async function (next) {
+    if (this.isNew) {
         this.remainingCapacity = this.capacity;
     }
     this.qrCode = await qrcode.toDataURL(`${process.env.FRONTEND_URL}/event/${this._id}`)
-    .then((url) => {
-        return url;
-    })
-    .catch((err) => {
-        throw new Error("QR Code generation failed");
-    })    
+        .then((url) => {
+            return url;
+        })
+        .catch((err) => {
+            throw new Error("QR Code generation failed");
+        })
     next();
 })
 

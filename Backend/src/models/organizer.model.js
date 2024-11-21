@@ -69,13 +69,13 @@ organizerSchema.pre('save', async function (next) {
 organizerSchema.pre('findOneAndDelete', async function (next) {
     const organizer = await this.model.findOne(this.getQuery());
     if (organizer) {
-        if(organizer.folderName) {
+        if (organizer.folderName) {
             await deleteFolder(organizer.folderName);
         }
         if (organizer.profilePicture) {
             await Image.findByIdAndDelete(organizer.profilePicture);
         }
-        if(organizer.createdEvents) {
+        if (organizer.createdEvents) {
             for (const event of organizer.createdEvents) {
                 await Event.findByIdAndDelete(event);
             }
@@ -93,10 +93,10 @@ organizerSchema.methods.generateAccessToken = function () {
         _id: this._id,
         email: this.email,
         mobile: this.mobile,
-        name : this.name
-    }, 
-    process.env.ACCESS_TOKEN_SECRET, {
-        
+        name: this.name
+    },
+        process.env.ACCESS_TOKEN_SECRET, {
+
         expiresIn: process.env.ACCESS_TOKEN_EXPIRY
     });
 };
@@ -104,9 +104,9 @@ organizerSchema.methods.generateAccessToken = function () {
 organizerSchema.methods.generateRefreshToken = function () {
     return jwt.sign({
         _id: this._id
-    }, 
-    process.env.REFRESH_TOKEN_SECRET, {
-        
+    },
+        process.env.REFRESH_TOKEN_SECRET, {
+
         expiresIn: process.env.REFRESH_TOKEN_EXPIRY
     });
 };

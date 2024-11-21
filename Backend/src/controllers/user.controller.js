@@ -27,9 +27,9 @@ const generateAcessAndRefreshTokens = async (userID) => {
 const registerUser = asyncHandler(async (req, res, next) => {
     const { email, name, mobile, password } = req.body;
 
-    if(
-        [name, email, password].some(field => field?.trim() === undefined || field?.trim() === null || field === "" )
-    ){
+    if (
+        [name, email, password].some(field => field?.trim() === undefined || field?.trim() === null || field === "")
+    ) {
         throw new ApiError(400, "Please provide all the required fields");
     }
 
@@ -37,24 +37,24 @@ const registerUser = asyncHandler(async (req, res, next) => {
         $or: [{ email }, { mobile }]
     })
 
-    if(existedUser){
+    if (existedUser) {
         throw new ApiError(409, "User with this email or mobile already exists");
     }
 
-    const user = await User.create({ 
-        email, 
-        name, 
-        mobile, 
-        password 
+    const user = await User.create({
+        email,
+        name,
+        mobile,
+        password
     });
 
-    if(!user){
+    if (!user) {
         throw new ApiError(500, "Failed to create user");
     }
 
     const mailSent = await sendVerificationMail("users", user._id, email);
 
-    if(!mailSent){
+    if (!mailSent) {
         await User.findByIdAndDelete(user._id);
         throw new ApiError(500, "Failed to send verification mail");
     }
@@ -63,39 +63,39 @@ const registerUser = asyncHandler(async (req, res, next) => {
         "-password -refreshToken"
     )
 
-    if(!createdUser){
+    if (!createdUser) {
         throw new ApiError(500, "Failed to create user");
     }
 
     return res
-    .status(201).json(
-        new ApiResponse(201, createdUser, "User created successfully")
-    );
+        .status(201).json(
+            new ApiResponse(201, createdUser, "User created successfully")
+        );
 })
 
 
 const loginUser = asyncHandler(async (req, res, next) => {
     const { email, mobile, password } = req.body;
 
-    if((!email && !mobile) || !password){
+    if ((!email && !mobile) || !password) {
         throw new ApiError(400, "Please provide email/mobile and password");
     }
 
     const user = await User.findOne({
         $or: [{ email }, { mobile }]
-    }); 
+    });
 
-    if(!user){
+    if (!user) {
         throw new ApiError(404, "User not found");
     }
 
     const isPasswordCorrect = await user.isPasswordCorrect(password);
 
-    if(!isPasswordCorrect){
+    if (!isPasswordCorrect) {
         throw new ApiError(401, "Invalid email/mobile or password");
     }
 
-    if(!user.verified){
+    if (!user.verified) {
         throw new ApiError(402, "User Email not verified");
     }
 
@@ -108,23 +108,23 @@ const loginUser = asyncHandler(async (req, res, next) => {
         "-password -refreshToken"
     );
 
-    if(!loggedInUser){
+    if (!loggedInUser) {
         throw new ApiError(500, "Failed to login user");
     }
 
     return res
-    .cookie("accessToken", accessToken, { ...options })
-    .cookie("refreshToken", refreshToken, { ...options })
-    .status(200).json(
-        new ApiResponse(200,
-            loggedInUser,
-            "User logged in successfully")
-    );
+        .cookie("accessToken", accessToken, { ...options })
+        .cookie("refreshToken", refreshToken, { ...options })
+        .status(200).json(
+            new ApiResponse(200,
+                loggedInUser,
+                "User logged in successfully")
+        );
 })
 
 const logoutUser = asyncHandler(async (req, res, next) => {
-    await User.findByIdAndUpdate(req.user?._id, 
-        { 
+    await User.findByIdAndUpdate(req.user?._id,
+        {
             $unset: { refreshToken: 1 }
         },
         { new: true }
@@ -132,17 +132,17 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 
 
     return res
-    .clearCookie("accessToken", { ...options })
-    .clearCookie("refreshToken", { ...options })
-    .status(200).json(
-        new ApiResponse(200, {}, "User logged out successfully")
-    );
+        .clearCookie("accessToken", { ...options })
+        .clearCookie("refreshToken", { ...options })
+        .status(200).json(
+            new ApiResponse(200, {}, "User logged out successfully")
+        );
 })
 
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken || req.headers["x-refresh-token"];
 
-    if(!incomingRefreshToken){
+    if (!incomingRefreshToken) {
         throw new ApiError(401, "Unauthorized request");
     }
 
@@ -150,11 +150,11 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
     const user = await User.findById(decodedToken._id);
 
-    if(!user){
+    if (!user) {
         throw new ApiError(404, "User not found");
     }
 
-    if(incomingRefreshToken !== user.refreshToken){
+    if (incomingRefreshToken !== user.refreshToken) {
         throw new ApiError(401, "Unauthorized request");
     }
 
@@ -164,29 +164,29 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     return res
-    .cookie("accessToken", accessToken, { options })
-    .cookie("refreshToken", refreshToken, { options })
-    .status(200).json(
-        new ApiResponse(200, { accessToken }, "Access token refreshed successfully")
-    );
+        .cookie("accessToken", accessToken, { options })
+        .cookie("refreshToken", refreshToken, { options })
+        .status(200).json(
+            new ApiResponse(200, { accessToken }, "Access token refreshed successfully")
+        );
 })
 
 const updateUserPassword = asyncHandler(async (req, res, next) => {
     const { oldPassword, newPassword } = req.body;
 
-    if(!oldPassword || !newPassword){
+    if (!oldPassword || !newPassword) {
         throw new ApiError(400, "Please provide old password and new password");
     }
 
     const user = await User.findById(req.user._id);
 
-    if(!user){
+    if (!user) {
         throw new ApiError(404, "User not found");
     }
 
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
-    if(!isPasswordCorrect){
+    if (!isPasswordCorrect) {
         throw new ApiError(401, "Invalid old password");
     }
 
@@ -194,24 +194,24 @@ const updateUserPassword = asyncHandler(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     return res
-    .status(200).json(
-        new ApiResponse(200, {}, "Password updated successfully")
-    );
+        .status(200).json(
+            new ApiResponse(200, {}, "Password updated successfully")
+        );
 })
 
 const updateUserDetails = asyncHandler(async (req, res, next) => {
     const { name, email, mobile } = req.body;
 
-    if(
-        [name, email, mobile].some(field => field?.trim() === undefined || field?.trim() === null || field === "" )
-    ){
+    if (
+        [name, email, mobile].some(field => field?.trim() === undefined || field?.trim() === null || field === "")
+    ) {
         throw new ApiError(400, "Please provide all the required fields");
     }
 
-    const user = await User.findByIdAndUpdate(req.user._id, 
+    const user = await User.findByIdAndUpdate(req.user._id,
         {
-            $set: { 
-                name, 
+            $set: {
+                name,
                 email,
                 mobile
             }
@@ -219,20 +219,20 @@ const updateUserDetails = asyncHandler(async (req, res, next) => {
         { new: true }
     );
 
-    if(!user){
+    if (!user) {
         throw new ApiError(500, "Failed to update user details");
     }
 
     return res
-    .status(200).json(
-        new ApiResponse(200, user, "User details updated successfully")
-    );
+        .status(200).json(
+            new ApiResponse(200, user, "User details updated successfully")
+        );
 })
 
 const getAttendedEvents = asyncHandler(async (req, res, next) => {
     const user = await User.aggregate([
         { $match: { _id: req.user._id } },
-        { 
+        {
             $lookup: {
                 from: "events",
                 localField: "eventHistory",
@@ -258,7 +258,7 @@ const getAttendedEvents = asyncHandler(async (req, res, next) => {
                     },
                     {
                         $lookup: {
-                            from : "images",
+                            from: "images",
                             localField: "coverImage",
                             foreignField: "_id",
                             as: "coverImage",
@@ -289,7 +289,7 @@ const getAttendedEvents = asyncHandler(async (req, res, next) => {
                 ]
             }
         },
-        { 
+        {
             $project: {
                 attendedEvents: 1,
                 _id: 0
@@ -299,14 +299,14 @@ const getAttendedEvents = asyncHandler(async (req, res, next) => {
 
     // const user = await User.findById(req.user._id).populate("eventHistory");
 
-    if(!user || user.length === 0){
+    if (!user || user.length === 0) {
         throw new ApiError(404, "User not found");
     }
 
     return res
-    .status(200).json(
-        new ApiResponse(200, user, "Attended events fetched successfully")
-    );
+        .status(200).json(
+            new ApiResponse(200, user, "Attended events fetched successfully")
+        );
 })
 
 export {
