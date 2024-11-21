@@ -22,7 +22,6 @@ const Login = () => {
         },
         body: JSON.stringify({ email: username, mobile: username, password }),
       });
-      console.log(response)
       if(!response.ok){
         message.error(response.statusText);
         return;
@@ -35,6 +34,7 @@ const Login = () => {
         });
         document.cookie = data.data.accessToken;
         localStorage.setItem('role', role);
+        localStorage.setItem('user', JSON.stringify(data.data));
       navigate('/dashboard');
     } catch (error) {
       console.error('Error logging in:', error);

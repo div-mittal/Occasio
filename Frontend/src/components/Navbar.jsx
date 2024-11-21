@@ -7,6 +7,7 @@ function Navbar({ page }) {
     let buttonText;
     let navigateTo;
 
+    if(!localStorage.role){
     switch (page) {
         case 'Landing':
         case 'Signup':
@@ -24,6 +25,11 @@ function Navbar({ page }) {
         default:
             buttonText = 'Login'; // default value
             navigateTo = '/login';
+    }
+    }else{
+        buttonText = 'Logout';
+        localStorage.clear();
+        navigateTo = './';
     }
 
     const toggleNav = () => {
@@ -57,7 +63,7 @@ function Navbar({ page }) {
                     className="ml-4 text-[1rem] px-4 py-1.5 font-semibold border border-wht border-opacity-50 hover:cursor-pointer hidden lg:flex" 
                     onClick={() => navigate(navigateTo)}
                 >
-                    {buttonText}
+                    {localStorage.user ? localStorage.user.name : ''} -- {buttonText}
                 </div>
             </div>
 

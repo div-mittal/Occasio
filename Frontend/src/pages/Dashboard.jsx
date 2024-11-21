@@ -9,10 +9,15 @@ const Dashboard = () => {
   const [sEvent, setSEvent] = useState(null);
 
   useEffect(() => {
+    const role=localStorage.getItem('role');
+    if(!role){
+      navigate('/login');
+    }
     const fetchEvents = async () => {
       try {
-        const response = await fetch("/api/events"); // replace with your actual API endpoint
+        const response = await fetch("http://localhost:9002/api/v1/organizers/events"); // replace with your actual API endpoint
         const data = await response.json();
+        console.log(data)
         // setEvents(data);
       } catch (err) {
         console.log(err);
