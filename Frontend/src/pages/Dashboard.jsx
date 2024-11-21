@@ -15,7 +15,10 @@ const Dashboard = () => {
     }
     const fetchEvents = async () => {
       try {
-        const response = await fetch("http://localhost:9002/api/v1/organizers/events"); // replace with your actual API endpoint
+        const response = await fetch("http://localhost:9002/api/v1/organizers/events", {
+            method: "GET",
+            credentials: "include",
+        });// replace with your actual API endpoint
         const data = await response.json();
         console.log(data)
         // setEvents(data);
@@ -39,7 +42,7 @@ const Dashboard = () => {
                                     event={event} 
                                     onClick={() => setSEvent(event)} 
                                 />
-                            ))} */}
+                            ))} */} 
               <div className="hover:cursor-pointer w-1/5"
                 onClick={() => {
                   console.log("Ecard clicked");
