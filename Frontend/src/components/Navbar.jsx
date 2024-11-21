@@ -15,7 +15,7 @@ function Navbar({ page }) {
                 : "http://localhost:9002/api/v1/organizers/logout";
 
         localStorage.removeItem('role');
-        localStorage.removeItem('user');
+        localStorage.removeItem('username');
 
         const response = await fetch(logoutURL, {
             method: 'POST',
@@ -91,7 +91,7 @@ function Navbar({ page }) {
                     className="ml-4 text-[1rem] px-4 py-1.5 font-semibold border border-wht border-opacity-50 hover:cursor-pointer hidden lg:flex" 
                     onClick={handleButtonClick}
                 >
-                    {localStorage.user ? localStorage.user.name : ''} -- {buttonText}
+                    {localStorage.username ? localStorage.username+' | ' :" "} {buttonText}
                 </div>
             </div>
 
