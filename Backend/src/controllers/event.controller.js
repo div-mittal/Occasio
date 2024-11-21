@@ -33,14 +33,13 @@ const scheduleEventReminder = async (event) => {
     })
 }
 
-
 const createEvent = asyncHandler(async (req, res) => {
     const organizer = await Organizer.findById(req.user?.id)
     if (!organizer) {
         throw new ApiError(404, "Organizer not found")
     }
     
-    const { title, description, date, time, location, state, city, type, capacity, deadline, deadlineTime } = req.body
+    const { title, description, date, time, location, state, city, type, capacity} = req.body
 
     // convert the incoming time to date and append it with the date of the event
     const eventDateTime = new Date(date);
@@ -48,14 +47,12 @@ const createEvent = asyncHandler(async (req, res) => {
     eventDateTime.setHours(hours);
     eventDateTime.setMinutes(minutes);    
 
-    // convert the incoming deadlineTime to date and append it with the deadline of the event
-    const deadlineDateTime = new Date(deadline);
-    const [deadlineHours, deadlineMinutes] = deadlineTime.split(':');
-    deadlineDateTime.setHours(deadlineHours);
-    deadlineDateTime.setMinutes(deadlineMinutes);
+    // Automatically set deadline to 2 hours before the event date
+    const deadlineDateTime = new Date(eventDateTime);
+    deadlineDateTime.setHours(deadlineDateTime.getHours() - 2);
 
     if(
-        [title, description, date, time, location, state, city, type, capacity, deadline, deadlineTime].some((field) => field === undefined || field === "")
+        [title, description, date, time, location, state, city, type, capacity].some((field) => field === undefined || field === "")
     ){
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
