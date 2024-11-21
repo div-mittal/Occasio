@@ -12,7 +12,7 @@ const Ecard = (props) => {
         navigate(`/event/${props.id}`);
     }
 return (
-    <div className={`h-full bg-[url(${props.cover.url})] bg-cover bg-center min-w-[20%] bg-opacity-70 bg-white flex flex-col justify-between items-center rounded-md`} onClick={()=>handleClick()}>
+    <div className="h-full bg-cover bg-center min-w-[20%] bg-opacity-70 bg-white flex flex-col justify-between items-center rounded-md" style={{ backgroundImage: `url(${props.cover.url})` }} onClick={()=>handleClick()}>
         <div className='flex flex-col justify-between h-full w-full p-2'>
             <div className='flex flex-row-reverse'>
                 <div className='flex flex-col items-center border-2 rounded-sm px-2 bg-blk bg-opacity-15'>
