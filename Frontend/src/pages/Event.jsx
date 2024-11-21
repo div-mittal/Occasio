@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router-dom";
 import RSVP from "../components/RSVP.jsx";
 import { useParams } from "react-router-dom";
+import { message } from "antd";
 
 const EventDetails = () => {
   const [user, setUser] = useState("Attendee"); // Example: Default set as "organizer" for testing
@@ -62,6 +63,7 @@ const EventDetails = () => {
 
   const handleConfirm = () => {
     // Implement the RSVP functionality here
+    
     console.log("RSVP Confirmed");
   };
 
@@ -81,6 +83,7 @@ const EventDetails = () => {
         credentials: "include",
         body: JSON.stringify(editableEvent),
       });
+      console.log(response)
       if (response.ok) {
         const updatedEvent = await response.json();
         console.log(updatedEvent.data)
@@ -106,11 +109,14 @@ const EventDetails = () => {
       });
       if (response.ok) {
         console.log("Update message sent successfully");
+        message.success("Update sent successfully")
       } else {
-        console.error("Error sending update message");
+        const data = await response.json();
+        console.error("Error sending update message", data.message);
+        message.error(`${data.message}`)
       }
     } catch (error) {
-      console.error("Error sending update message:", error);
+      console.error("Error sending update message:", error.message);
     }
   };
 

@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { message } from 'antd';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const location = useLocation();
   const [role, setRole] = useState(location.state?.role || "Attendee");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const user=localStorage.username;
+    if(user){
+      navigate('/dashboard')
+    }
+  },[]);
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {

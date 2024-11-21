@@ -200,11 +200,10 @@ const createEvent = asyncHandler(async (req, res) => {
 })
 
 const updateEvent = asyncHandler(async (req, res) => {
-    try {
-        const organizer = await Organizer.findById(req.user?.id);
-        if (!organizer) {
-            throw new ApiError(404, "Organizer not found");
-        }
+    const organizer = await Organizer.findById(req.user?.id)
+    if (!organizer) {
+        throw new ApiError(404, "Organizer not found")
+    }
 
         const { eventid } = req.params;
         const event = await Event.findById(eventid);
@@ -216,11 +215,23 @@ const updateEvent = asyncHandler(async (req, res) => {
             throw new ApiError(401, "Unauthorized");
         }
 
-        const { title, description, date, location, state, city, type, capacity } = req.body;
+    const { title, description, date, time, location, state, city, type, capacity, deadline, deadlineTime } = req.body
 
-        if ([title, description, date, location, state, city, type, capacity].some(field => !field)) {
-            throw new ApiError(400, "All fields are required");
-        }
+    // convert the incoming time to date and append it with the date of the event
+    const eventDateTime = new Date(date);
+    const [hours, minutes] = time.split(':');
+    eventDateTime.setHours(hours);
+    eventDateTime.setMinutes(minutes);
+
+    // Automatically set deadline to 2 hours before the new event date
+    const deadlineDateTime = new Date(eventDateTime);
+    deadlineDateTime.setHours(deadlineDateTime.getHours() - 2);
+
+    if (
+        [title, description, date, time, location, state, city, type, capacity].some((field) => field === undefined || field === "")
+    ) {
+        throw new ApiError(400, "All fields are required")
+    }
 
         if (Number(capacity) <= 0) {
             throw new ApiError(400, "Capacity should be greater than 0");
