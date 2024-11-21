@@ -22,7 +22,6 @@ const Login = () => {
         },
         body: JSON.stringify({ email: username, mobile: username, password }),
       });
-      console.log(response)
       if(!response.ok){
         message.error(response.statusText);
         return;
