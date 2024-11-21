@@ -43,7 +43,7 @@ const Add = () => {
                     credentials: "include",
                 }
             );
-
+            console.log(response)
             if (response.ok) {
                 const data = await response.json();
                 console.log("Event registered successfully:", data);
