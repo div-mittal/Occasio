@@ -223,84 +223,26 @@ const updateEvent = asyncHandler(async (req, res) => {
     eventDateTime.setHours(hours);
     eventDateTime.setMinutes(minutes);
 
-    // convert the incoming deadlineTime to date and append it with the deadline of the event
-    const deadlineDateTime = new Date(deadline);
-    const [deadlineHours, deadlineMinutes] = deadlineTime.split(':');
-    deadlineDateTime.setHours(deadlineHours);
-    deadlineDateTime.setMinutes(deadlineMinutes);
+    // Automatically set deadline to 2 hours before the new event date
+    const deadlineDateTime = new Date(eventDateTime);
+    deadlineDateTime.setHours(deadlineDateTime.getHours() - 2);
 
     if (
-        [title, description, date, time, location, state, city, type, capacity, deadline, deadlineTime].some((field) => field === undefined || field === "")
+        [title, description, date, time, location, state, city, type, capacity].some((field) => field === undefined || field === "")
     ) {
-        fs.unlinkSync(req.files?.image[0]?.path)
-        fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if (req.files?.gallery) {
-            req.files.gallery.forEach((file) => {
-                fs.unlinkSync(file.path)
-            })
-        }
         throw new ApiError(400, "All fields are required")
     }
 
     if (capacity <= 0) {
-        fs.unlinkSync(req.files?.image[0]?.path)
-        fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if (req.files?.gallery) {
-            req.files.gallery.forEach((file) => {
-                fs.unlinkSync(file.path)
-            })
-        }
         throw new ApiError(400, "Capacity should be greater than 0")
     }
 
     if (eventDateTime < new Date()) {
-        fs.unlinkSync(req.files?.image[0]?.path)
-        fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if (req.files?.gallery) {
-            req.files.gallery.forEach((file) => {
-                fs.unlinkSync(file.path)
-            })
-        }
         throw new ApiError(400, "Date should be greater than current date")
     }
 
     if (deadlineDateTime > eventDateTime) {
-        fs.unlinkSync(req.files?.image[0]?.path)
-        fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if (req.files?.gallery) {
-            req.files.gallery.forEach((file) => {
-                fs.unlinkSync(file.path)
-            })
-        }
         throw new ApiError(400, "Deadline should be less than date")
-    }
-
-    const imagePath = req.files?.image[0]?.path
-    let image;
-    if (imagePath) {
-        // Delete old image
-        await Image.findByIdAndDelete(event.image);
-        image = await Image.create({
-            title: title + " Image",
-            folderName: req.user?.folderName,
-            url: imagePath
-        });
-    } else {
-        image = event.image;
-    }
-
-    const coverImagePath = req.files?.coverImage[0]?.path
-    let coverImage;
-    if (coverImagePath) {
-        // Delete old cover image
-        await Image.findByIdAndDelete(event.coverImage);
-        coverImage = await Image.create({
-            title: title + " Cover Image",
-            folderName: req.user?.folderName,
-            url: coverImagePath
-        });
-    } else {
-        coverImage = event.coverImage;
     }
 
     const remainingCapacity = event.remainingCapacity + (capacity - event.capacity);
@@ -315,8 +257,6 @@ const updateEvent = asyncHandler(async (req, res) => {
             state,
             city,
             type,
-            image: image._id,
-            coverImage: coverImage._id,
             capacity,
             remainingCapacity,
             deadline: deadlineDateTime
@@ -325,11 +265,6 @@ const updateEvent = asyncHandler(async (req, res) => {
     )
 
     if (!updatedEvent) {
-        if (req.files?.gallery) {
-            req.files.gallery.forEach((file) => {
-                fs.unlinkSync(file.path)
-            })
-        }
         throw new ApiError(500, "Event update failed")
     }
 
@@ -704,12 +639,6 @@ const sendMailToParticipants = asyncHandler(async (req, res) => {
     if (!event) {
         throw new ApiError(404, "Event not found")
     }
-    
-    const subject = req.body.subject
-
-    if (!subject) {
-        throw new ApiError(400, "Subject is required")
-    }
 
     const message = req.body.message
     if(!message) {
@@ -724,11 +653,12 @@ const sendMailToParticipants = asyncHandler(async (req, res) => {
 
     const participantEmails = participants.map(participant => participant.user.email)    
 
+    const subject = `Update About Event ${event.title}`
     const htmlMessage = `<p>${message}</p><p>Best regards,<br>${req.user.name}</p>`
 
     const mailOptions = {
         to: participantEmails,
-        subject: req.body.subject,
+        subject,
         html: htmlMessage
     }
 

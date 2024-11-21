@@ -22,10 +22,6 @@ router.route("/create").post(
 
 router.route("/update/:eventid").post(
     verifyJWT(Organizer),
-    upload.fields([
-        { name: "image", maxCount: 1 },
-        { name: "coverImage", maxCount: 1 }
-    ]),
     updateEvent
 );
 
