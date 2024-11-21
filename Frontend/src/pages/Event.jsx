@@ -60,33 +60,52 @@ const EventDetails = () => {
     }
   };
 
-
   const handleConfirm = () => {
     // Implement the RSVP functionality here
-    
+
     console.log("RSVP Confirmed");
   };
 
-  const handleDeleteEvent = () => {
-    // Implement the delete functionality
-    console.log("Event deleted");
-    navigate("/dashboard"); // Example: Redirecting to events list
+  const handleDeleteEvent = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:9002/api/v1/events/delete/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        console.log("Event deleted successfully");
+        navigate("/dashboard"); // Redirecting to events list
+      } else {
+        console.error("Error deleting event");
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
   };
 
   const handleUpdateEvent = async () => {
     try {
-      const response = await fetch(`http://localhost:9002/api/v1/events/update/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(editableEvent),
-      });
-      console.log(response)
+      const response = await fetch(
+        `http://localhost:9002/api/v1/events/update/${id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(editableEvent),
+        }
+      );
+      console.log(response);
       if (response.ok) {
         const updatedEvent = await response.json();
-        console.log(updatedEvent.data)
+        console.log(updatedEvent.data);
         setEvent(updatedEvent.data);
         console.log("Event updated successfully");
       } else {
@@ -99,21 +118,24 @@ const EventDetails = () => {
 
   const handleSendUpdate = async () => {
     try {
-      const response = await fetch(`http://localhost:9002/api/v1/events/send-mail/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ message: updateMessage }),
-      });
+      const response = await fetch(
+        `http://localhost:9002/api/v1/events/send-mail/${id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ message: updateMessage }),
+        }
+      );
       if (response.ok) {
         console.log("Update message sent successfully");
-        message.success("Update sent successfully")
+        message.success("Update sent successfully");
       } else {
         const data = await response.json();
         console.error("Error sending update message", data.message);
-        message.error(`${data.message}`)
+        message.error(`${data.message}`);
       }
     } catch (error) {
       console.error("Error sending update message:", error.message);
@@ -155,10 +177,10 @@ const EventDetails = () => {
                         </button>
                       </div>
                     </div>
-                    <div className="flex h-full gap-1 pt-2">
-                      <div className="w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
+                    <div className="flex h-full gap-1 pt-2 justify-center">
+                      {/* <div className="w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
                         <h1 className="text-2xl font-medium">Options</h1>
-                      </div>
+                      </div> */}
                       <div className="w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
                         <h1 className="text-2xl font-medium">Share QR Code</h1>
                         {event.qrCode && (
@@ -210,8 +232,8 @@ const EventDetails = () => {
                               value={
                                 editableEvent
                                   ? new Date(editableEvent.date)
-                                    .toISOString()
-                                    .split("T")[0]
+                                      .toISOString()
+                                      .split("T")[0]
                                   : ""
                               }
                               onChange={(e) =>
@@ -229,16 +251,17 @@ const EventDetails = () => {
                               value={
                                 editableEvent
                                   ? new Date(editableEvent.date)
-                                    .toLocaleTimeString("en-US", { hour12: false })
-                                    .slice(0, 5)
+                                      .toLocaleTimeString("en-US", {
+                                        hour12: false,
+                                      })
+                                      .slice(0, 5)
                                   : ""
                               }
-                              onChange={(e) => handleInputChange("time", e.target.value)}
+                              onChange={(e) =>
+                                handleInputChange("time", e.target.value)
+                              }
                               className="w-full p-2 border border-wht border-opacity-50 rounded-lg bg-blk text-wht"
                             />
-
-
-
                           </div>
                         </div>
                       </div>
@@ -264,36 +287,45 @@ const EventDetails = () => {
               <div className="flex flex-row gap-8 h-full">
                 <div className="w-1/3">
                   <img
-                    src={event.data.coverImage.url}
-                    alt={event.data.coverImage.title}
+                    src={event.coverImage.url}
+                    alt={event.coverImage.title}
                     className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
                 <div className="flex flex-col w-2/3 justify-between">
                   <div>
                     <h1 className="text-wht text-6xl font-bold">
-                      {event.data.title}
+                      {event.title}
                     </h1>
-                    <p className="text-wht text-lg">{event.data.city}</p>
+                    <p className="text-wht text-lg">
+                      {event.location + ", " + event.city + ", " + event.state}
+                    </p>
                   </div>
                   <div className="mt-4">
                     <h2 className="text-wht text-xl font-semibold">
                       About the Event
                     </h2>
                     <p className="text-wht border border-solid border-wht border-opacity-25 rounded-lg p-4 mt-2 h-24">
-                      {event.data.description}
+                      {event.description}
                     </p>
                   </div>
-
                   <div className="flex flex-row gap-8 mt-4">
-                    <button
-                      className="px-6 py-2 bg-ylw text-blk font-bold rounded-lg"
-                      onClick={handleConfirm}
-                    >
-                      RSVP
-                    </button>
+                    <div className="flex flex-col items-center justify-center border border-solid border-wht border-opacity-25 rounded-lg p-4">
+                      <h3 className="text-wht text-2xl">
+                        {new Date(event.date).toLocaleDateString()}
+                      </h3>
+                      <p className="text-wht text-lg">Dec</p>
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center border border-solid border-wht border-opacity-25 rounded-lg p-4">
+                      <h3 className="text-wht text-2xl">
+                        {new Date(event.date).toLocaleTimeString()}
+                      </h3>
+                      <p className="text-wht text-lg">onwards</p>
+                    </div>
                   </div>
                 </div>
+                <RSVP eventid={id}/>
               </div>
             )
           ) : (

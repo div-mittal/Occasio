@@ -7,13 +7,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [sEvent, setSEvent] = useState(null);
-
+  const [role,setRole]=useState(localStorage.role)
   useEffect(() => {
-    const role = localStorage.getItem("role");
-    if (!role) {
-      navigate("/login");
-      return;
-    }
 
     const fetchEvents = async () => {
       try {
@@ -65,10 +60,14 @@ const Dashboard = () => {
               ))}
             </div>
           ) : (
-            <></>
+            <div className="event-list flex flex-col items-center justify-center h-full">
+              <h1 className="text-6xl font-bold text-gray-600">No Events to Show</h1>
+              <h1 className="text-md font-normal text-gray-400">Click "Add Event" to join public Events</h1>
+            </div>
           )}
-          <div className="flex justify-center items-center h-12 w-12 bg-ylw rounded-md absolute bottom-16 right-12">
-            <h1
+          <div className="flex justify-center items-center bg-ylw p-2 rounded-md absolute bottom-16 right-12">
+            {role=="Organizer"?(
+              <h1
               className="text-4xl font-bold text-blk hover:cursor-pointer"
               onClick={() => {
                 navigate("/add");
@@ -76,6 +75,18 @@ const Dashboard = () => {
             >
               +
             </h1>
+            )
+            :(
+              <h1
+              className="text-3xl font-bold text-blk hover:cursor-pointer"
+              onClick={() => {
+                navigate("/events");
+              }}
+            >
+              Add Event
+            </h1>
+            )
+            }
           </div>
         </div>
       </div>
