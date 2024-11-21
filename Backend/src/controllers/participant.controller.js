@@ -169,7 +169,7 @@ const registerForEvent = asyncHandler(async (req, res, next) => {
 
     return res
         .status(201).json(
-            new ApiResponse(201, createdParticipant, "Registered for event successfully")
+            new ApiResponse(201, createdParticipant[0], "Registered for event successfully")
         );
 })
 
@@ -219,40 +219,8 @@ const unregisterFromEvent = asyncHandler(async (req, res, next) => {
         );
 })
 
-const getRSVPStatus = asyncHandler(async (req, res, next) => {
-    const { eventID } = req.params;
-
-    const event = await Event.findById(eventID);
-
-    if (!event) {
-        throw new ApiError(404, "Event not found");
-    }
-
-    const user = await User.findById(req.user._id);
-
-    if (!user) {
-        throw new ApiError(404, "User not found");
-    }
-
-    const participant = await Participant.findOne({
-        user: user._id,
-        event: event._id
-    });
-
-    if (!participant) {
-        throw new ApiError(404, "User not registered for event");
-    }
-
-    return res
-        .status(200).json(
-            new ApiResponse(200, participant.rsvpStatus, "RSVP status found")
-        );
-
-})
-
 export {
     registerForEvent,
     checkParticipant,
-    unregisterFromEvent,
-    getRSVPStatus
+    unregisterFromEvent
 }

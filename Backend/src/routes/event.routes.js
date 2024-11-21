@@ -5,7 +5,7 @@ import { Organizer } from "../models/organizer.model.js";
 import { User } from "../models/user.model.js";
 
 import { createEvent, updateEvent, removeImagesFromGallery, addImagesToGallery, getEventInfo, verifyRSVPUsingQRCode, disableRegistrations, getAllOpenEvents, sendMailToParticipants } from "../controllers/event.controller.js";
-import { registerForEvent, checkParticipant, unregisterFromEvent, getRSVPStatus } from "../controllers/participant.controller.js";
+import { registerForEvent, checkParticipant, unregisterFromEvent } from "../controllers/participant.controller.js";
 
 
 const router = Router();
@@ -50,11 +50,6 @@ router.route("/disable/:eventid").put(
 router.route("/verify-rsvp/:eventid").post(
     verifyJWT(Organizer),
     verifyRSVPUsingQRCode
-);
-
-router.route("/rsvp-status/:eventid").get(
-    verifyJWT(User),
-    getRSVPStatus
 );
 
 router.route("/send-mail/:eventid").post(
