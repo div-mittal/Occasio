@@ -459,6 +459,12 @@ const getEvents = asyncHandler(async (req, res) => {
                         }
                     },
                     {
+                        $addFields: {
+                            image: { $arrayElemAt: ["$image", 0] },
+                            coverImage: { $arrayElemAt: ["$coverImage", 0] }
+                        }
+                    },
+                    {
                         $project: {
                             __id: 0,
                             description: 0,
@@ -475,7 +481,6 @@ const getEvents = asyncHandler(async (req, res) => {
                             __v: 0
                         }
                     },
-                    
                 ]
             }
         },
@@ -494,10 +499,10 @@ const getEvents = asyncHandler(async (req, res) => {
         }
     ]);
 
-    return res
+       return res
         .status(200)
         .json(
-            new ApiResponse(200, events, "Events found successfully")
+            new ApiResponse(200, events[0], "Events found successfully")
         );
 });
 
