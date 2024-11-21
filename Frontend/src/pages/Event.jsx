@@ -37,6 +37,10 @@ const EventDetails = () => {
     fetchEvent();
   }, [id]);
 
+  const handleScan = () => {
+    navigate(`/scan/${id +'-'+event.title}`);
+  }
+
   const handleInputChange = (field, value) => {
     if (field === "time") {
       // Extract the date part from the existing editableEvent.date
@@ -271,6 +275,12 @@ const EventDetails = () => {
                           className="mt-4 px-6 py-2 bg-ylw text-blk font-bold rounded-lg"
                         >
                           Update Event
+                        </button>
+                        <button
+                          onClick={handleScan}
+                          className="mt-4 px-6 py-2 bg-ylw text-blk font-bold rounded-lg"
+                        >
+                          Event Scaning
                         </button>
                         <button
                           onClick={handleDeleteEvent}

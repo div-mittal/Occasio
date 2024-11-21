@@ -20,7 +20,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard/>} />
         <Route path='/add' element={<Add/>} />
         <Route path='/event/:id' element={<Event />} />
-        <Route path='/scan' element={<Scan />} />
+        <Route path='/scan/:id' element={<Scan />} />
       </Routes>
     </>
   );
