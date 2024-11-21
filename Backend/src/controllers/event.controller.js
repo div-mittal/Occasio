@@ -578,7 +578,7 @@ const sendRSVPMailsToParticipants = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Event not found")
     }
 
-    const participants = await Participant.find({ event: eventid }).populate("user")
+    const participants = await Participant.find({ event: eventid, rsvpStatus: "not-going" }).populate("user")
 
     if (participants.length === 0) {
         throw new ApiError(404, "No participants found")
@@ -588,11 +588,7 @@ const sendRSVPMailsToParticipants = asyncHandler(async (req, res) => {
 
     const rsvpLink = `${process.env.FRONTEND_URL}/events/${eventid}`;
 
-    //TODO: check the mail content The name of the organizer is showing undefined
-
-    const organizer = await Organizer.findById(event.createdBy)
-
-    const message = `Dear Participant,\n\nYou are invited to RSVP for the event "${event.title}".\n\nLocation: ${event.location}\nDate: ${event.date}\nTime: ${event.time}\n\nPlease RSVP at your earliest convenience by clicking the link below:\n\n${rsvpLink}\n\nBest regards,\n${organizer.name}`;
+    const message = `Dear Participant,\n\nYou are invited to RSVP for the event "${event.title}".\n\nLocation: ${event.location}\nDate: ${event.date}\nTime: ${event.time}\n\nPlease RSVP at your earliest convenience by clicking the link below:\n\n${rsvpLink}\n\nBest regards,\n${req.user.name}`;
 
     const mailOptions = {
         to: participantEmails,
@@ -657,6 +653,19 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, participant, "Participant verified successfully"))
 })
 
+const getAllOpenEvents = asyncHandler(async (req, res) => {
+    const currentDate = new Date();
+    const events = await Event.find({ type: "open", registrationsEnabled: true, deadline: { $gt: currentDate } });
+    
+    if (!events.length) {
+        throw new ApiError(404, "No open events found");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, events, "Open events retrieved successfully"));
+})
+
 const disableRegistrations = asyncHandler(async (req, res) => {
     const organizerID = req.user?.id
     if (!organizerID) {
@@ -688,6 +697,48 @@ const disableRegistrations = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, event, "Registrations disabled successfully"))
 })
 
+const sendMailToParticipants = asyncHandler(async (req, res) => {
+    const { eventid } = req.params
+    const event = await Event.findById(eventid)
+
+    if (!event) {
+        throw new ApiError(404, "Event not found")
+    }
+    
+    const subject = req.body.subject
+
+    if (!subject) {
+        throw new ApiError(400, "Subject is required")
+    }
+
+    const message = req.body.message
+    if(!message) {
+        throw new ApiError(400, "Message is required")
+    }
+
+    const participants = await Participant.find({ event: eventid }).populate("user")
+
+    if (participants.length === 0) {
+        throw new ApiError(404, "No participants found")
+    }
+
+    const participantEmails = participants.map(participant => participant.user.email)    
+
+    const htmlMessage = `<p>${message}</p><p>Best regards,<br>${req.user.name}</p>`
+
+    const mailOptions = {
+        to: participantEmails,
+        subject: req.body.subject,
+        html: htmlMessage
+    }
+
+    await sendMail(mailOptions)
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, null, "Mail sent successfully"))
+})
+
 export {
     createEvent,
     updateEvent,
@@ -696,5 +747,7 @@ export {
     getEventInfo,
     verifyRSVPUsingQRCode,
     disableRegistrations,
-    sendRSVPMailsToParticipants
+    getAllOpenEvents,
+    sendRSVPMailsToParticipants,
+    sendMailToParticipants
 }
