@@ -902,3 +902,5 @@ export {
     getAllOpenEvents,
     sendMailToParticipants
 }
+
+//TODO: delete event
