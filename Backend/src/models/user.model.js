@@ -38,11 +38,11 @@ const userSchema = new Schema(
         ],
         refreshToken: {
             type: String,
-        },  
+        },
     },
     {
         timestamps: true
-    } 
+    }
 )
 
 userSchema.pre('save', async function (next) {
@@ -62,9 +62,9 @@ userSchema.methods.generateAccessToken = function () {
         email: this.email,
         mobile: this.mobile,
         name: this.name,
-    }, 
-    process.env.ACCESS_TOKEN_SECRET, {
-        
+    },
+        process.env.ACCESS_TOKEN_SECRET, {
+
         expiresIn: process.env.ACCESS_TOKEN_EXPIRY
     });
 };
@@ -72,9 +72,9 @@ userSchema.methods.generateAccessToken = function () {
 userSchema.methods.generateRefreshToken = function () {
     return jwt.sign({
         _id: this._id
-    }, 
-    process.env.REFRESH_TOKEN_SECRET, {
-        
+    },
+        process.env.REFRESH_TOKEN_SECRET, {
+
         expiresIn: process.env.REFRESH_TOKEN_EXPIRY
     });
 };

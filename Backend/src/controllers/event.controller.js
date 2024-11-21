@@ -38,25 +38,25 @@ const createEvent = asyncHandler(async (req, res) => {
     if (!organizer) {
         throw new ApiError(404, "Organizer not found")
     }
-    
-    const { title, description, date, time, location, state, city, type, capacity} = req.body
+
+    const { title, description, date, time, location, state, city, type, capacity } = req.body
 
     // convert the incoming time to date and append it with the date of the event
     const eventDateTime = new Date(date);
     const [hours, minutes] = time.split(':');
     eventDateTime.setHours(hours);
-    eventDateTime.setMinutes(minutes);    
+    eventDateTime.setMinutes(minutes);
 
     // Automatically set deadline to 2 hours before the event date
     const deadlineDateTime = new Date(eventDateTime);
     deadlineDateTime.setHours(deadlineDateTime.getHours() - 2);
 
-    if(
+    if (
         [title, description, date, time, location, state, city, type, capacity].some((field) => field === undefined || field === "")
-    ){
+    ) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -64,10 +64,10 @@ const createEvent = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-    if(capacity <= 0){
+    if (capacity <= 0) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -75,10 +75,10 @@ const createEvent = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Capacity should be greater than 0")
     }
 
-    if(eventDateTime < new Date()){
+    if (eventDateTime < new Date()) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -86,10 +86,10 @@ const createEvent = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Date should be greater than current date")
     }
 
-    if(deadlineDateTime < new Date()){
+    if (deadlineDateTime < new Date()) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -97,10 +97,10 @@ const createEvent = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Deadline should be greater than current date")
     }
 
-    if(deadlineDateTime > eventDateTime){
+    if (deadlineDateTime > eventDateTime) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -112,15 +112,15 @@ const createEvent = asyncHandler(async (req, res) => {
     const coverImagePath = req.files?.coverImage[0]?.path
 
     const image = await Image.create({
-        title : title + " Image",
+        title: title + " Image",
         folderName: req.user?.folderName,
         url: imagePath
     })
 
-    if(!image){
+    if (!image) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -134,41 +134,41 @@ const createEvent = asyncHandler(async (req, res) => {
         url: coverImagePath
     })
 
-    if(!coverImage){
+    if (!coverImage) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
         }
         throw new ApiError(500, "Cover Image upload failed")
     }
-    
+
     const event = await Event.create({
         title,
         description,
-        date : eventDateTime,
+        date: eventDateTime,
         location,
         deadline: deadlineDateTime,
         state,
         city,
         type,
         capacity,
-        image : image._id,
-        coverImage : coverImage._id,
+        image: image._id,
+        coverImage: coverImage._id,
         createdBy: organizer
     })
 
-    if(!event){
-        if(req.files?.gallery){
+    if (!event) {
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
         }
         throw new ApiError(500, "Event creation failed")
     }
-    
+
     const galleryImages = req.files?.gallery
     if (galleryImages) {
         const galleryImagePromises = galleryImages.map(async (file, index) => {
@@ -195,8 +195,8 @@ const createEvent = asyncHandler(async (req, res) => {
     await scheduleEventReminder(event)
 
     return res
-    .status(201)
-    .json(new ApiResponse(201, event, "Event created successfully"))
+        .status(201)
+        .json(new ApiResponse(201, event, "Event created successfully"))
 })
 
 const updateEvent = asyncHandler(async (req, res) => {
@@ -229,12 +229,12 @@ const updateEvent = asyncHandler(async (req, res) => {
     deadlineDateTime.setHours(deadlineHours);
     deadlineDateTime.setMinutes(deadlineMinutes);
 
-    if(
+    if (
         [title, description, date, time, location, state, city, type, capacity, deadline, deadlineTime].some((field) => field === undefined || field === "")
-    ){
+    ) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -242,10 +242,10 @@ const updateEvent = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-    if(capacity <= 0){
+    if (capacity <= 0) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -253,10 +253,10 @@ const updateEvent = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Capacity should be greater than 0")
     }
 
-    if(eventDateTime < new Date()){
+    if (eventDateTime < new Date()) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -264,10 +264,10 @@ const updateEvent = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Date should be greater than current date")
     }
 
-    if(deadlineDateTime > eventDateTime){
+    if (deadlineDateTime > eventDateTime) {
         fs.unlinkSync(req.files?.image[0]?.path)
         fs.unlinkSync(req.files?.coverImage[0]?.path)
-        if(req.files?.gallery){
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -324,8 +324,8 @@ const updateEvent = asyncHandler(async (req, res) => {
         { new: true }
     )
 
-    if(!updatedEvent){
-        if(req.files?.gallery){
+    if (!updatedEvent) {
+        if (req.files?.gallery) {
             req.files.gallery.forEach((file) => {
                 fs.unlinkSync(file.path)
             })
@@ -334,8 +334,8 @@ const updateEvent = asyncHandler(async (req, res) => {
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, updatedEvent, "Event updated successfully"))
+        .status(200)
+        .json(new ApiResponse(200, updatedEvent, "Event updated successfully"))
 })
 
 const removeImagesFromGallery = asyncHandler(async (req, res) => {
@@ -356,23 +356,23 @@ const removeImagesFromGallery = asyncHandler(async (req, res) => {
 
     const galleryImages = req.body.galleryImages
 
-    if(!galleryImages){
+    if (!galleryImages) {
         throw new ApiError(400, "Gallery images are required")
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
         eventid,
-        { 
-            $pull: { 
-                gallery: { 
-                    $in: galleryImages 
-                } 
-            } 
+        {
+            $pull: {
+                gallery: {
+                    $in: galleryImages
+                }
+            }
         },
         { new: true }
     )
 
-    if(!updatedEvent){
+    if (!updatedEvent) {
         throw new ApiError(500, "Gallery images removal failed")
     }
 
@@ -381,8 +381,8 @@ const removeImagesFromGallery = asyncHandler(async (req, res) => {
     })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, updatedEvent, "Gallery images removed successfully"))
+        .status(200)
+        .json(new ApiResponse(200, updatedEvent, "Gallery images removed successfully"))
 })
 
 const addImagesToGallery = asyncHandler(async (req, res) => {
@@ -420,23 +420,23 @@ const addImagesToGallery = asyncHandler(async (req, res) => {
 
     const updatedEvent = await Event.findByIdAndUpdate(
         eventid,
-        { 
-            $push: { 
-                gallery: { 
-                    $each: await Promise.all(galleryImagePromises) 
-                } 
-            } 
+        {
+            $push: {
+                gallery: {
+                    $each: await Promise.all(galleryImagePromises)
+                }
+            }
         },
         { new: true }
     )
 
-    if(!updatedEvent){
+    if (!updatedEvent) {
         throw new ApiError(500, "Gallery images addition failed")
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, updatedEvent, "Gallery images added successfully"))
+        .status(200)
+        .json(new ApiResponse(200, updatedEvent, "Gallery images added successfully"))
 })
 
 const getEventInfo = asyncHandler(async (req, res) => {
@@ -562,13 +562,13 @@ const getEventInfo = asyncHandler(async (req, res) => {
         }
     ])
 
-    if(eventData.length === 0){
+    if (eventData.length === 0) {
         throw new ApiError(404, "Event not found")
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, eventData[0], "Event data retrieved successfully"))
+        .status(200)
+        .json(new ApiResponse(200, eventData[0], "Event data retrieved successfully"))
 })
 
 const sendRSVPMailsToParticipants = asyncHandler(async (req, res) => {
@@ -578,9 +578,9 @@ const sendRSVPMailsToParticipants = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Event not found")
     }
 
-    const participants = await Participant.find({ event: eventid}).populate("user")
+    const participants = await Participant.find({ event: eventid }).populate("user")
 
-    if(participants.length === 0){
+    if (participants.length === 0) {
         throw new ApiError(404, "No participants found")
     }
 
@@ -603,14 +603,14 @@ const sendRSVPMailsToParticipants = asyncHandler(async (req, res) => {
     await sendMail(mailOptions);
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, null, "RSVP mails sent successfully"))
+        .status(200)
+        .json(new ApiResponse(200, null, "RSVP mails sent successfully"))
 })
 
 const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
     // TODO: implement capture image of the person while registering for the event and when the same person checks in the event using the qr code provided, the event coordinator gets to see the RSVP status and the image which can be used to verify if the same person is attending the event who registered in the event
     const organizerID = req.user?.id
-    if(!organizerID){
+    if (!organizerID) {
         throw new ApiError(401, "Unauthorized")
     }
 
@@ -626,7 +626,7 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Event not found")
     }
 
-    if(event.createdBy.toString() !== organizer._id.toString()){
+    if (event.createdBy.toString() !== organizer._id.toString()) {
         throw new ApiError(401, "Unauthorized")
     }
 
@@ -645,7 +645,7 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Participant not going")
     }
 
-    if (participant,rsvpStatus == "checked-in"){
+    if (participant, rsvpStatus == "checked-in") {
         throw new ApiError(400, "Participant already checked in")
     }
 
@@ -653,13 +653,13 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
     await participant.save({ validateBeforeSave: false })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, participant, "Participant verified successfully"))
+        .status(200)
+        .json(new ApiResponse(200, participant, "Participant verified successfully"))
 })
 
 const disableRegistrations = asyncHandler(async (req, res) => {
     const organizerID = req.user?.id
-    if(!organizerID){
+    if (!organizerID) {
         throw new ApiError(401, "Unauthorized")
     }
 
@@ -669,14 +669,14 @@ const disableRegistrations = asyncHandler(async (req, res) => {
     }
 
     const { eventid } = req.params
-    
+
     const event = await Event.findById(eventid)
 
     if (!event) {
         throw new ApiError(404, "Event not found")
     }
 
-    if(event.createdBy.toString() !== organizer._id.toString()){
+    if (event.createdBy.toString() !== organizer._id.toString()) {
         throw new ApiError(401, "Unauthorized")
     }
 
@@ -684,17 +684,17 @@ const disableRegistrations = asyncHandler(async (req, res) => {
     await event.save({ validateBeforeSave: false })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, event, "Registrations disabled successfully"))
+        .status(200)
+        .json(new ApiResponse(200, event, "Registrations disabled successfully"))
 })
 
-export { 
+export {
     createEvent,
     updateEvent,
     removeImagesFromGallery,
     addImagesToGallery,
     getEventInfo,
     verifyRSVPUsingQRCode,
-    disableRegistrations, 
+    disableRegistrations,
     sendRSVPMailsToParticipants
 }

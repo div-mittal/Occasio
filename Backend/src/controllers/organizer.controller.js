@@ -25,13 +25,13 @@ const generateAcessAndRefreshTokens = async (organizerId) => {
 };
 
 const registerOrganizer = asyncHandler(async (req, res) => {
-    
+
     // get the data from the request body
     const { name, email, mobile, password, address } = req.body;
 
-    if( 
-        [name, email, mobile, password].some(field => field?.trim() === undefined || field?.trim() === null || field === "" )
-    ){
+    if (
+        [name, email, mobile, password].some(field => field?.trim() === undefined || field?.trim() === null || field === "")
+    ) {
         fs.unlinkSync(req.file?.path);
         throw new ApiError(400, "Please provide all the required fields");
     }
@@ -40,21 +40,21 @@ const registerOrganizer = asyncHandler(async (req, res) => {
         $or: [{ email }, { mobile }]
     })
 
-    if(existedUser){
+    if (existedUser) {
         fs.unlinkSync(req.file?.path);
         throw new ApiError(409, "User with this email or mobile already exists");
     }
 
     const profilePicturePath = req.file?.path;
 
-    if(!profilePicturePath){
+    if (!profilePicturePath) {
         throw new ApiError(400, "Profile picture is required");
     }
 
     const folderName = `${name.split(" ").join("-").toLowerCase()}-${Date.now()}`;
     const createdFolder = await createFolder(folderName);
 
-    if(!createdFolder){
+    if (!createdFolder) {
         throw new ApiError(500, "Something went wrong while creating the folder");
     }
 
@@ -64,7 +64,7 @@ const registerOrganizer = asyncHandler(async (req, res) => {
         url: profilePicturePath
     });
 
-    if(!profilePicture){
+    if (!profilePicture) {
         throw new ApiError(500, "Something went wrong while creating the profile picture");
     }
 
@@ -72,15 +72,15 @@ const registerOrganizer = asyncHandler(async (req, res) => {
         name,
         email,
         mobile,
-        profilePicture : profilePicture._id,
+        profilePicture: profilePicture._id,
         folderName,
         password,
-        address : address || ""
+        address: address || ""
     });
 
     const mailSent = await sendVerificationMail("organizers", organizer._id, email);
 
-    if(!mailSent){
+    if (!mailSent) {
         await Organizer.findByIdAndDelete(organizer._id);
         throw new ApiError(500, "Failed to send verification mail");
     }
@@ -89,15 +89,15 @@ const registerOrganizer = asyncHandler(async (req, res) => {
         "-password -refreshToken"
     )
 
-    if(!createdOrganizer){
+    if (!createdOrganizer) {
         throw new ApiError(500, "Something went wrong while creating the user");
     }
 
     return res
-    .status(201)
-    .json(
-        new ApiResponse(201, createdOrganizer, "Organizer created successfully")
-    );
+        .status(201)
+        .json(
+            new ApiResponse(201, createdOrganizer, "Organizer created successfully")
+        );
 });
 
 const loginOrganizer = asyncHandler(async (req, res) => {
@@ -127,7 +127,7 @@ const loginOrganizer = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Invalid organizer credentials");
     }
 
-    if(!organizer.verified){
+    if (!organizer.verified) {
         throw new ApiError(402, "Organizer Email not verified");
     }
 
@@ -153,37 +153,37 @@ const loginOrganizer = asyncHandler(async (req, res) => {
 });
 
 const logoutOrganizer = asyncHandler(async (req, res) => {
-    await Organizer.findByIdAndUpdate(req.user?._id, 
-        { 
+    await Organizer.findByIdAndUpdate(req.user?._id,
+        {
             $unset: { refreshToken: 1 }
         },
         { new: true }
     );
 
     return res
-    .status(200)
-    .clearCookie("accessToken", { ...options })
-    .clearCookie("refreshToken", { ...options })
-    .json(
-        new ApiResponse(200, {}, "Organizer logged out successfully")
-    )
+        .status(200)
+        .clearCookie("accessToken", { ...options })
+        .clearCookie("refreshToken", { ...options })
+        .json(
+            new ApiResponse(200, {}, "Organizer logged out successfully")
+        )
 })
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken || req.headers["x-refresh-token"];
 
-    if(!incomingRefreshToken){
+    if (!incomingRefreshToken) {
         throw new ApiError(401, "Unauthorized request");
     }
 
     const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
     const organizer = await Organizer.findById(decodedToken._id);
 
-    if(!organizer){
+    if (!organizer) {
         throw new ApiError(404, "Organizer not found");
     }
 
-    if(incomingRefreshToken !== organizer?.refreshToken){
+    if (incomingRefreshToken !== organizer?.refreshToken) {
         throw new ApiError(401, "Refresh token is expired or used");
     }
 
@@ -193,38 +193,38 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     await organizer.save({ validateBeforeSave: false });
 
     return res
-    .status(200)
-    .cookie("accessToken", accessToken, {options})
-    .cookie("refreshToken", refreshToken, {options})
-    .json(
-        new ApiResponse(200, { accessToken, refreshToken }, "Token refreshed successfully")
-    )
+        .status(200)
+        .cookie("accessToken", accessToken, { options })
+        .cookie("refreshToken", refreshToken, { options })
+        .json(
+            new ApiResponse(200, { accessToken, refreshToken }, "Token refreshed successfully")
+        )
 })
 
 const updateOrganizerPassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body;
-    if(!oldPassword || !newPassword){
+    if (!oldPassword || !newPassword) {
         throw new ApiError(400, "Old password and new password are required");
     }
 
     const organizer = await Organizer.findById(req.user?._id);
-    if(!organizer){
+    if (!organizer) {
         throw new ApiError(404, "Organizer not found");
     }
 
     const isPasswordCorrect = await organizer.isPasswordCorrect(oldPassword);
-    if(!isPasswordCorrect){
+    if (!isPasswordCorrect) {
         throw new ApiError(401, "Invalid old password");
     }
-    
+
     organizer.password = newPassword;
-    await organizer.save({validateBeforeSave: false});
+    await organizer.save({ validateBeforeSave: false });
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200, {}, "Password updated successfully")
-    )
+        .status(200)
+        .json(
+            new ApiResponse(200, {}, "Password updated successfully")
+        )
 
 });
 
@@ -279,7 +279,7 @@ const getCurrentOrganizer = asyncHandler(async (req, res) => {
                     },
                     {
                         $lookup: {
-                            from : "images",
+                            from: "images",
                             localField: "coverImage",
                             foreignField: "_id",
                             as: "coverImage",
@@ -301,14 +301,14 @@ const getCurrentOrganizer = asyncHandler(async (req, res) => {
                             startDate: 1,
                             endDate: 1,
                             location: 1,
-                            date : 1,
+                            date: 1,
                             time: 1,
                             image: 1,
                             coverImage: 1,
                             status: 1
                         }
                     },
-                    
+
                 ]
             }
         },
@@ -322,22 +322,22 @@ const getCurrentOrganizer = asyncHandler(async (req, res) => {
     ]);
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200, organizer, "Current Organizer found successfully")
-    )
+        .status(200)
+        .json(
+            new ApiResponse(200, organizer, "Current Organizer found successfully")
+        )
 });
 
 const updateOrganizerDetails = asyncHandler(async (req, res) => {
     const { name, email, mobile, address } = req.body;
-    if(!name || !email || !mobile || !address){
+    if (!name || !email || !mobile || !address) {
         throw new ApiError(400, "Name, Email, Mobile and Address are required");
     }
 
-    const organizer = await Organizer.findByIdAndUpdate(req.user?._id, 
+    const organizer = await Organizer.findByIdAndUpdate(req.user?._id,
         {
-            $set: { 
-                name, 
+            $set: {
+                name,
                 email,
                 mobile,
                 address,
@@ -347,20 +347,20 @@ const updateOrganizerDetails = asyncHandler(async (req, res) => {
         { new: true }
     ).select("-password");
 
-    if(!organizer){
+    if (!organizer) {
         throw new ApiError(500, "Something went wrong while updating the organizer details");
     }
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200, organizer, "Organizer details updated successfully")
-    )
+        .status(200)
+        .json(
+            new ApiResponse(200, organizer, "Organizer details updated successfully")
+        )
 });
 
 const updateProfilePicture = asyncHandler(async (req, res) => {
     const profilePicturePath = req.file?.path;
-    if(!profilePicturePath){
+    if (!profilePicturePath) {
         throw new ApiError(400, "Profile picture is required");
     }
 
@@ -369,12 +369,12 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
         url: profilePicturePath
     });
 
-    if(!profilePicture){
+    if (!profilePicture) {
         throw new ApiError(500, "Something went wrong while uploading the profile picture");
     }
 
     const oldProfilePicture = req.user?.profilePicture;
-    if(oldProfilePicture){
+    if (oldProfilePicture) {
         await Image.findByIdAndDelete(oldProfilePicture);
     }
 
@@ -386,10 +386,10 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
     ).select("-password");
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200, organizer, "Profile picture updated successfully")
-    )
+        .status(200)
+        .json(
+            new ApiResponse(200, organizer, "Profile picture updated successfully")
+        )
 })
 
 const deleteOrganizer = asyncHandler(async (req, res) => {
@@ -443,7 +443,7 @@ const getEvents = asyncHandler(async (req, res) => {
                     },
                     {
                         $lookup: {
-                            from : "images",
+                            from: "images",
                             localField: "coverImage",
                             foreignField: "_id",
                             as: "coverImage",
@@ -499,15 +499,17 @@ const getEvents = asyncHandler(async (req, res) => {
         }
     ]);
 
-       return res
+    console.log(events[0].events);
+
+    return res
         .status(200)
         .json(
             new ApiResponse(200, events[0], "Events found successfully")
         );
 });
 
-export { 
-    registerOrganizer, 
+export {
+    registerOrganizer,
     loginOrganizer,
     logoutOrganizer,
     refreshAccessToken,

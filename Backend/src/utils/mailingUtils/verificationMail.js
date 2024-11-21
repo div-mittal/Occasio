@@ -1,6 +1,6 @@
 import { sendMail } from './mailSender.js';
 
-const sendVerificationMail = async(modelType, userID, userMail) => {
+const sendVerificationMail = async (modelType, userID, userMail) => {
     const buttonStyle = `
         display: inline-block;
         padding: 10px 20px;

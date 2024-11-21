@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { uploadFile, deleteFile } from "../utils/S3Utils.js";
 
 const imageSchema = new Schema(

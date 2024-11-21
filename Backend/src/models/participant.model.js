@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import qrcode from "qrcode";
 
 const participantSchema = new Schema(
@@ -32,14 +32,14 @@ const participantSchema = new Schema(
     }
 )
 
-participantSchema.pre("save", async function(next){
+participantSchema.pre("save", async function (next) {
     this.qrCode = await qrcode.toDataURL(`${this._id}`)
-    .then((url) => {
-        return url;
-    })
-    .catch((err) => {
-        throw new Error("QR Code generation failed");
-    })
+        .then((url) => {
+            return url;
+        })
+        .catch((err) => {
+            throw new Error("QR Code generation failed");
+        })
     next();
 })
 

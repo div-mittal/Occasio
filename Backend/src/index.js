@@ -5,16 +5,16 @@ import { app } from "./app.js";
 dotenv.config();
 
 connectDB()
-.then(() => {
+    .then(() => {
 
-    app.get("/", (req, res) => {
-        res.send("Hello World");
+        app.get("/", (req, res) => {
+            res.send("Hello World");
+        });
+        app.listen(process.env.PORT, () => {
+            console.log(`Server is running on port http://localhost:${process.env.PORT}/`);
+        });
+    })
+    .catch((error) => {
+        console.log("MongoDB connection error", error);
+        process.exit(1);
     });
-    app.listen(process.env.PORT, () => {
-        console.log(`Server is running on port http://localhost:${process.env.PORT}/`);
-    });
-})
-.catch((error) => {
-    console.log("MongoDB connection error",error);
-    process.exit(1);
-});
