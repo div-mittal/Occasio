@@ -147,7 +147,7 @@ const loginOrganizer = asyncHandler(async (req, res) => {
         .cookie("refreshToken", refreshToken, { ...options })
         .json(
             new ApiResponse(200,
-                { organizer: loggedInOrganizer, accessToken, refreshToken },
+                loggedInOrganizer,
                 "Organizer logged in successfully")
         );
 });

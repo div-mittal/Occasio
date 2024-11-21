@@ -37,10 +37,8 @@ const Add = () => {
                 "http://localhost:9002/api/v1/events/create",
                 {
                     method: "POST",
-                    headers: {
-                        Authorization: document.cookie,
-                    },
                     body: formData,
+                    credentials: "include",
                 }
             );
 
