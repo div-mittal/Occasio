@@ -16,7 +16,7 @@ const scheduleEventReminder = async (event) => {
     reminderTime.setMinutes(reminderTime.getMinutes() - 30)
 
     schedule.scheduleJob(reminderTime, async () => {
-        const participants = await Participant.find({ event: event._id, rsvpStatus: "going" });
+        const participants = await Participant.find({ event: event._id });
         if (participants.length > 0) {
             const participantEmails = await Promise.all(participants.map(async participant => {
                 const user = await User.findById(participant.user);
@@ -630,37 +630,37 @@ const getEventInfo = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, eventData[0], "Event data retrieved successfully"))
 })
 
-const sendRSVPMailsToParticipants = asyncHandler(async (req, res) => {
-    const { eventid } = req.params
-    const event = await Event.findById(eventid)
-    if (!event) {
-        throw new ApiError(404, "Event not found")
-    }
+// const sendRSVPMailsToParticipants = asyncHandler(async (req, res) => {
+//     const { eventid } = req.params
+//     const event = await Event.findById(eventid)
+//     if (!event) {
+//         throw new ApiError(404, "Event not found")
+//     }
 
-    const participants = await Participant.find({ event: eventid, rsvpStatus: "not-going" }).populate("user")
+//     const participants = await Participant.find({ event: eventid, rsvpStatus: "not-going" }).populate("user")
 
-    if (participants.length === 0) {
-        throw new ApiError(404, "No participants found")
-    }
+//     if (participants.length === 0) {
+//         throw new ApiError(404, "No participants found")
+//     }
 
-    const participantEmails = participants.map(participant => participant.user.email)
+//     const participantEmails = participants.map(participant => participant.user.email)
 
-    const rsvpLink = `${process.env.FRONTEND_URL}/events/${eventid}`;
+//     const rsvpLink = `${process.env.FRONTEND_URL}/events/${eventid}`;
 
-    const message = `Dear Participant,\n\nYou are invited to RSVP for the event "${event.title}".\n\nLocation: ${event.location}\nDate: ${event.date}\nTime: ${event.time}\n\nPlease RSVP at your earliest convenience by clicking the link below:\n\n${rsvpLink}\n\nBest regards,\n${req.user.name}`;
+//     const message = `Dear Participant,\n\nYou are invited to RSVP for the event "${event.title}".\n\nLocation: ${event.location}\nDate: ${event.date}\nTime: ${event.time}\n\nPlease RSVP at your earliest convenience by clicking the link below:\n\n${rsvpLink}\n\nBest regards,\n${req.user.name}`;
 
-    const mailOptions = {
-        to: participantEmails,
-        subject: `RSVP for ${event.title}`,
-        text: message
-    };
+//     const mailOptions = {
+//         to: participantEmails,
+//         subject: `RSVP for ${event.title}`,
+//         text: message
+//     };
 
-    await sendMail(mailOptions);
+//     await sendMail(mailOptions);
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, null, "RSVP mails sent successfully"))
-})
+//     return res
+//         .status(200)
+//         .json(new ApiResponse(200, null, "RSVP mails sent successfully"))
+// })
 
 const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
     // TODO: implement capture image of the person while registering for the event and when the same person checks in the event using the qr code provided, the event coordinator gets to see the RSVP status and the image which can be used to verify if the same person is attending the event who registered in the event
@@ -696,11 +696,7 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Participant not found")
     }
 
-    if (participant.rsvpStatus != "going") {
-        throw new ApiError(400, "Participant not going")
-    }
-
-    if (participant, rsvpStatus == "checked-in") {
+    if (participant.rsvpStatus == "checked-in") {
         throw new ApiError(400, "Participant already checked in")
     }
 
@@ -863,6 +859,5 @@ export {
     verifyRSVPUsingQRCode,
     disableRegistrations,
     getAllOpenEvents,
-    sendRSVPMailsToParticipants,
     sendMailToParticipants
 }

@@ -70,7 +70,6 @@ const checkParticipant = asyncHandler(async (req, res, next) => {
 
 const registerForEvent = asyncHandler(async (req, res, next) => {
     const { eventID } = req.params;
-    const { badge, preferences } = req.body;
 
     const event = await Event.findById(eventID);
 
@@ -95,8 +94,6 @@ const registerForEvent = asyncHandler(async (req, res, next) => {
     const participant = await Participant.create({
         user: user._id,
         event: event._id,
-        badge,
-        preferences
     });
 
     await event.registerParticipant(participant._id);
@@ -176,34 +173,6 @@ const registerForEvent = asyncHandler(async (req, res, next) => {
         );
 })
 
-const updateDetails = asyncHandler(async (req, res, next) => {
-    const { eventID } = req.params;
-    const { badge, preferences } = req.body;
-
-    const event = await Event.findById(eventID);
-
-    if (!event) {
-        throw new ApiError(404, "Event not found");
-    }
-
-    const user = await User.findById(req.user._id);
-
-    if (!user) {
-        throw new ApiError(404, "User not found");
-    }
-
-    const participant = await Participant.findOneAndUpdate(
-        { user: user._id, event: event._id },
-        { badge, preferences },
-        { new: true }
-    );
-
-    return res
-        .status(200).json(
-            new ApiResponse(200, participant, "Participant details updated successfully")
-        );
-})
-
 const unregisterFromEvent = asyncHandler(async (req, res, next) => {
     const { eventID } = req.params;
 
@@ -250,9 +219,8 @@ const unregisterFromEvent = asyncHandler(async (req, res, next) => {
         );
 })
 
-const updateRSVPStatus = asyncHandler(async (req, res, next) => {
+const getRSVPStatus = asyncHandler(async (req, res, next) => {
     const { eventID } = req.params;
-    const { rsvpStatus } = req.body;
 
     const event = await Event.findById(eventID);
 
@@ -266,52 +234,25 @@ const updateRSVPStatus = asyncHandler(async (req, res, next) => {
         throw new ApiError(404, "User not found");
     }
 
-    const participant = await Participant.findOneAndUpdate(
-        { user: user._id, event: event._id },
-        { rsvpStatus },
-        { new: true }
-    );
-
-    return res
-        .status(200).json(
-            new ApiResponse(200, participant, "RSVP status updated successfully")
-        );
-})
-
-const getRSVPStatus = asyncHandler(async (req, res, next) => {
-    const { eventID } = req.params;
-
-    const event = await Event.findById(eventID);
-    if(!event) {
-        throw new ApiError(404, "Event not found");
-    }
-
-    const user = await User.findById(req.user._id);
-
-    if(!user) {
-        throw new ApiError(404, "User not found");
-    }
-
     const participant = await Participant.findOne({
         user: user._id,
         event: event._id
     });
 
-    if(!participant) {
+    if (!participant) {
         throw new ApiError(404, "User not registered for event");
     }
 
     return res
         .status(200).json(
-            new ApiResponse(200, participant.rsvpStatus, "RSVP status retrieved successfully")
+            new ApiResponse(200, participant.rsvpStatus, "RSVP status found")
         );
+
 })
 
 export {
     registerForEvent,
     checkParticipant,
-    updateDetails,
     unregisterFromEvent,
-    updateRSVPStatus,
     getRSVPStatus
 }

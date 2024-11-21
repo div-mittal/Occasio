@@ -13,15 +13,8 @@ const participantSchema = new Schema(
         },
         rsvpStatus: {
             type: String,
-            enum: ["going", "not-going", "maybe", "checked-in"],
-            default: "not-going"
-        },
-        badge: {
-            type: String,
-            default: "none"
-        },
-        preferences: {
-            type: String
+            enum: ["going", "checked-in"],
+            default: "going"
         },
         qrCode: {
             type: String

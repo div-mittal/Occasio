@@ -4,8 +4,8 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { Organizer } from "../models/organizer.model.js";
 import { User } from "../models/user.model.js";
 
-import { createEvent, updateEvent, removeImagesFromGallery, addImagesToGallery, getEventInfo, verifyRSVPUsingQRCode, disableRegistrations, getAllOpenEvents, sendRSVPMailsToParticipants, sendMailToParticipants } from "../controllers/event.controller.js";
-import { registerForEvent, checkParticipant, updateDetails, unregisterFromEvent, updateRSVPStatus, getRSVPStatus } from "../controllers/participant.controller.js";
+import { createEvent, updateEvent, removeImagesFromGallery, addImagesToGallery, getEventInfo, verifyRSVPUsingQRCode, disableRegistrations, getAllOpenEvents, sendMailToParticipants } from "../controllers/event.controller.js";
+import { registerForEvent, checkParticipant, unregisterFromEvent, getRSVPStatus } from "../controllers/participant.controller.js";
 
 
 const router = Router();
@@ -38,11 +38,6 @@ router.route("/remove-images/:eventid").delete(
     removeImagesFromGallery
 );
 
-router.route("/send-rsvp-mails/:eventid").post(
-    verifyJWT(Organizer),
-    sendRSVPMailsToParticipants
-);
-
 router.route("/info/:eventid").get(
     getEventInfo
 );
@@ -55,6 +50,11 @@ router.route("/disable/:eventid").put(
 router.route("/verify-rsvp/:eventid").post(
     verifyJWT(Organizer),
     verifyRSVPUsingQRCode
+);
+
+router.route("/rsvp-status/:eventid").get(
+    verifyJWT(User),
+    getRSVPStatus
 );
 
 router.route("/send-mail/:eventid").post(
@@ -72,24 +72,9 @@ router.route("/check/:eventID").get(
     checkParticipant
 );
 
-router.route("/update-details/:eventID").put(
-    verifyJWT(User),
-    updateDetails
-);
-
 router.route("/unregister/:eventID").delete(
     verifyJWT(User),
     unregisterFromEvent
-);
-
-router.route("/update-rsvp/:eventID").put(
-    verifyJWT(User),
-    updateRSVPStatus
-);
-
-router.route("/rsvp-status/:eventID").get(
-    verifyJWT(User),
-    getRSVPStatus
 );
 
 router.route("/open").get(
