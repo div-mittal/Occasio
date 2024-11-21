@@ -200,78 +200,202 @@ const createEvent = asyncHandler(async (req, res) => {
 })
 
 const updateEvent = asyncHandler(async (req, res) => {
-    const organizer = await Organizer.findById(req.user?.id)
-    if (!organizer) {
-        throw new ApiError(404, "Organizer not found")
+    try {
+        const organizer = await Organizer.findById(req.user?.id);
+        if (!organizer) {
+            throw new ApiError(404, "Organizer not found");
+        }
+
+        const { eventid } = req.params;
+        const event = await Event.findById(eventid);
+        if (!event) {
+            throw new ApiError(404, "Event not found");
+        }
+
+        if (event.createdBy.toString() !== organizer._id.toString()) {
+            throw new ApiError(401, "Unauthorized");
+        }
+
+        const { title, description, date, location, state, city, type, capacity } = req.body;
+
+        if ([title, description, date, location, state, city, type, capacity].some(field => !field)) {
+            throw new ApiError(400, "All fields are required");
+        }
+
+        if (Number(capacity) <= 0) {
+            throw new ApiError(400, "Capacity should be greater than 0");
+        }
+
+        if (isNaN(new Date(date))) {
+            throw new ApiError(400, "Invalid date format");
+        }
+
+        const deadlineDateTime = new Date(date);
+        deadlineDateTime.setHours(deadlineDateTime.getHours() - 2);
+
+        if (deadlineDateTime < new Date()) {
+            throw new ApiError(400, "Event date should be greater than current date");
+        }
+
+        if (deadlineDateTime > new Date(date)) {
+            throw new ApiError(400, "Deadline should be at least 2 hours before the event date");
+        }
+
+        const remainingCapacity = event.remainingCapacity + (Number(capacity) - Number(event.capacity));
+        if (remainingCapacity < 0) {
+            throw new ApiError(400, "Remaining capacity cannot be negative");
+        }
+
+        const updatedEvent = await Event.findByIdAndUpdate(
+            eventid,
+            {
+                title,
+                description,
+                date,
+                location,
+                state,
+                city,
+                type,
+                capacity,
+                remainingCapacity,
+                deadline: deadlineDateTime,
+            },
+            { new: true }
+        );
+
+        if (!updatedEvent) {
+            throw new ApiError(500, "Event update failed");
+        }
+
+        const updatedEventWithImages = await Event.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(eventid) }
+            },
+            {
+                $lookup: {
+                    from: "images",
+                    localField: "image",
+                    foreignField: "_id",
+                    as: "image",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 0,
+                                __v: 0,
+                                folderName: 0,
+                                createdAt: 0,
+                                updatedAt: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: "$image"
+            },
+            {
+                $lookup: {
+                    from: "images",
+                    localField: "coverImage",
+                    foreignField: "_id",
+                    as: "coverImage",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 0,
+                                __v: 0,
+                                folderName: 0,
+                                createdAt: 0,
+                                updatedAt: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: "$coverImage"
+            },
+            {
+                $lookup: {
+                    from: "images",
+                    localField: "gallery",
+                    foreignField: "_id",
+                    as: "gallery",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 0,
+                                __v: 0,
+                                folderName: 0,
+                                createdAt: 0,
+                                updatedAt: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $lookup: {
+                    from: "organizers",
+                    localField: "createdBy",
+                    foreignField: "_id",
+                    as: "createdBy",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "images",
+                                localField: "profilePicture",
+                                foreignField: "_id",
+                                as: "profilePicture",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            _id: 0,
+                                            __v: 0,
+                                            folderName: 0,
+                                            createdAt: 0,
+                                            updatedAt: 0
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            $unwind: "$profilePicture"
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                __v: 0,
+                                password: 0,
+                                createdAt: 0,
+                                updatedAt: 0,
+                                folderName: 0,
+                                createdEvents: 0,
+                                refreshToken: 0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $unwind: "$createdBy"
+            },
+            {
+                $project: {
+                    __v: 0
+                }
+            }
+        ]);
+
+
+        return res.status(200).json(new ApiResponse(200, updatedEventWithImages[0], "Event updated successfully"));
+    } catch (error) {
+        console.error("Error updating event:", error);
+        throw new ApiError(500, "Internal Server Error");
     }
+});
 
-    const { eventid } = req.params
-    const event = await Event.findById(eventid)
-    if (!event) {
-        throw new ApiError(404, "Event not found")
-    }
-
-    if (event.createdBy.toString() !== organizer._id.toString()) {
-        throw new ApiError(401, "Unauthorized")
-    }
-
-    const { title, description, date, time, location, state, city, type, capacity, deadline, deadlineTime } = req.body
-
-    // convert the incoming time to date and append it with the date of the event
-    const eventDateTime = new Date(date);
-    const [hours, minutes] = time.split(':');
-    eventDateTime.setHours(hours);
-    eventDateTime.setMinutes(minutes);
-
-    // Automatically set deadline to 2 hours before the new event date
-    const deadlineDateTime = new Date(eventDateTime);
-    deadlineDateTime.setHours(deadlineDateTime.getHours() - 2);
-
-    if (
-        [title, description, date, time, location, state, city, type, capacity].some((field) => field === undefined || field === "")
-    ) {
-        throw new ApiError(400, "All fields are required")
-    }
-
-    if (capacity <= 0) {
-        throw new ApiError(400, "Capacity should be greater than 0")
-    }
-
-    if (eventDateTime < new Date()) {
-        throw new ApiError(400, "Date should be greater than current date")
-    }
-
-    if (deadlineDateTime > eventDateTime) {
-        throw new ApiError(400, "Deadline should be less than date")
-    }
-
-    const remainingCapacity = event.remainingCapacity + (capacity - event.capacity);
-
-    const updatedEvent = await Event.findByIdAndUpdate(
-        eventid,
-        {
-            title,
-            description,
-            date: eventDateTime,
-            location,
-            state,
-            city,
-            type,
-            capacity,
-            remainingCapacity,
-            deadline: deadlineDateTime
-        },
-        { new: true }
-    )
-
-    if (!updatedEvent) {
-        throw new ApiError(500, "Event update failed")
-    }
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, updatedEvent, "Event updated successfully"))
-})
 
 const removeImagesFromGallery = asyncHandler(async (req, res) => {
     const organizer = await Organizer.findById(req.user?.id)
@@ -648,7 +772,7 @@ const sendMailToParticipants = asyncHandler(async (req, res) => {
     const participants = await Participant.find({ event: eventid }).populate("user")
 
     if (participants.length === 0) {
-        throw new ApiError(404, "No participants found")
+        throw new ApiError(404, "No participants registered for the Event")
     }
 
     const participantEmails = participants.map(participant => participant.user.email)    

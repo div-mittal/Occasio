@@ -23,8 +23,12 @@ const EventDetails = () => {
           `http://localhost:9002/api/v1/events/info/${id}`
         );
         const data = await response.json();
-        setEvent(data);
-        setEditableEvent(data); // Initialize editableEvent with fetched data
+        console.log(data.data);
+        setEvent(data.data);
+        setEditableEvent({
+          ...data.data,
+          date: data.data.date, // Keep raw date for parsing
+        });
       } catch (error) {
         console.error("Error fetching event:", error);
       }
@@ -32,13 +36,29 @@ const EventDetails = () => {
     fetchEvent();
   }, [id]);
 
-  useEffect(() => {
-    console.log(event);
-  }, [event]);
-
   const handleInputChange = (field, value) => {
-    setEditableEvent({ ...editableEvent, data: { ...editableEvent.data, [field]: value } });
+    if (field === "time") {
+      // Extract the date part from the existing editableEvent.date
+      const currentDate = new Date(editableEvent.date);
+      const [hours, minutes] = value.split(":");
+      currentDate.setHours(hours);
+      currentDate.setMinutes(minutes);
+
+      setEditableEvent({ ...editableEvent, date: currentDate.toISOString() });
+    } else if (field === "date") {
+      // Merge the updated date with the existing time
+      const currentDate = new Date(editableEvent.date);
+      const newDate = new Date(value);
+      currentDate.setFullYear(newDate.getFullYear());
+      currentDate.setMonth(newDate.getMonth());
+      currentDate.setDate(newDate.getDate());
+
+      setEditableEvent({ ...editableEvent, date: currentDate.toISOString() });
+    } else {
+      setEditableEvent({ ...editableEvent, [field]: value });
+    }
   };
+
 
   const handleConfirm = () => {
     // Implement the RSVP functionality here
@@ -63,7 +83,8 @@ const EventDetails = () => {
       });
       if (response.ok) {
         const updatedEvent = await response.json();
-        setEvent(updatedEvent);
+        console.log(updatedEvent.data)
+        setEvent(updatedEvent.data);
         console.log("Event updated successfully");
       } else {
         console.error("Error updating event");
@@ -104,8 +125,8 @@ const EventDetails = () => {
                 <div className="org-opt flex flex-col md:flex-row gap-8 h-full">
                   <div className="w-1/4">
                     <img
-                      src={event.data.coverImage.url}
-                      alt={event.data.coverImage.title}
+                      src={event.coverImage.url}
+                      alt={event.coverImage.title}
                       className="w-full h-full object-cover rounded-lg"
                     />
                   </div>
@@ -114,7 +135,7 @@ const EventDetails = () => {
                       <h1 className="text-wht font-medium text-2xl">
                         Send Update
                       </h1>
-                      <div className="flex flex-row items-center gap-1 ">
+                      <div className="flex flex-row items-center gap-1">
                         <textarea
                           className="w-full rounded"
                           value={updateMessage}
@@ -133,10 +154,10 @@ const EventDetails = () => {
                         <h1 className="text-2xl font-medium">Options</h1>
                       </div>
                       <div className="w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
-                        <h1 className="text-2xl font-medium">Share Qr Code</h1>
-                        {event.data.qrCode && (
+                        <h1 className="text-2xl font-medium">Share QR Code</h1>
+                        {event.qrCode && (
                           <img
-                            src={event.data.qrCode}
+                            src={event.qrCode}
                             alt="Event QR Code"
                             className="w-full h-full object-scale-down rounded-lg"
                           />
@@ -153,7 +174,7 @@ const EventDetails = () => {
                           </label>
                           <input
                             type="text"
-                            value={editableEvent.data.title}
+                            value={editableEvent.title}
                             onChange={(e) =>
                               handleInputChange("title", e.target.value)
                             }
@@ -166,7 +187,7 @@ const EventDetails = () => {
                           </label>
                           <input
                             type="text"
-                            value={editableEvent.data.city}
+                            value={editableEvent.city}
                             onChange={(e) =>
                               handleInputChange("city", e.target.value)
                             }
@@ -181,9 +202,11 @@ const EventDetails = () => {
                             <input
                               type="date"
                               value={
-                                new Date(editableEvent.data.date)
-                                  .toISOString()
-                                  .split("T")[0]
+                                editableEvent
+                                  ? new Date(editableEvent.date)
+                                    .toISOString()
+                                    .split("T")[0]
+                                  : ""
                               }
                               onChange={(e) =>
                                 handleInputChange("date", e.target.value)
@@ -197,15 +220,19 @@ const EventDetails = () => {
                             </label>
                             <input
                               type="time"
-                              value={new Date(editableEvent.data.date)
-                                .toISOString()
-                                .split("T")[1]
-                                .substring(0, 5)}
-                              onChange={(e) =>
-                                handleInputChange("time", e.target.value)
+                              value={
+                                editableEvent
+                                  ? new Date(editableEvent.date)
+                                    .toLocaleTimeString("en-US", { hour12: false })
+                                    .slice(0, 5)
+                                  : ""
                               }
+                              onChange={(e) => handleInputChange("time", e.target.value)}
                               className="w-full p-2 border border-wht border-opacity-50 rounded-lg bg-blk text-wht"
                             />
+
+
+
                           </div>
                         </div>
                       </div>
@@ -253,27 +280,18 @@ const EventDetails = () => {
                   </div>
 
                   <div className="flex flex-row gap-8 mt-4">
-                    <div className="flex flex-col items-center justify-center border border-solid border-wht border-opacity-25 rounded-lg p-4">
-                      <h3 className="text-wht text-2xl font-bold">
-                        {new Date(event.data.date).toLocaleDateString()}
-                      </h3>{" "}
-                    </div>
-
-                    <div className="flex flex-col items-center justify-center border border-solid border-wht border-opacity-25 rounded-lg p-4">
-                      <h3 className="text-wht text-2xl">
-                        {new Date(event.data.date).toLocaleTimeString()}
-                      </h3>
-                      <p className="text-wht text-lg">onwards</p>
-                    </div>
+                    <button
+                      className="px-6 py-2 bg-ylw text-blk font-bold rounded-lg"
+                      onClick={handleConfirm}
+                    >
+                      RSVP
+                    </button>
                   </div>
                 </div>
-                <RSVP handleConfirm={handleConfirm} />
               </div>
             )
           ) : (
-            <div className="text-center text-wht">
-              <p>Loading event details...</p>
-            </div>
+            <p>Loading event details...</p>
           )}
         </div>
       </div>
