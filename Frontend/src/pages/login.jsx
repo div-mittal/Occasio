@@ -10,37 +10,39 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const url =
-      role === "Attendee"
-        ? "http://localhost:9002/api/v1/users/login"
-        : "http://localhost:9002/api/v1/organizers/login";
+        const url =
+            role === "Attendee"
+                ? "http://localhost:9002/api/v1/users/login"
+                : "http://localhost:9002/api/v1/organizers/login";
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: username, mobile: username, password }),
-      });
-      if(!response.ok){
-        message.error(response.statusText);
-        return;
-      }
-      const data = await response.json();
-      console.log(data);
-        document.cookie.split(";").forEach((c) => {
-          document.cookie = c
-            .replace(/^ +/, "")
-            .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: username, mobile: username, password }),
+            credentials: 'include', // Include cookies in the response
         });
-        document.cookie = data.data.accessToken;
+
+        if (!response.ok) {
+            message.error(response.statusText);
+            return;
+        }
+
+        const data = await response.json();
+        console.log(data);
+
+        // Store additional information as needed
         localStorage.setItem('role', role);
         localStorage.setItem('username', username);
+
+        // Navigate to the dashboard
         navigate('/dashboard');
     } catch (error) {
-      console.error('Error logging in:', error);
+        console.error('Error logging in:', error);
     }
   };
+
 
   return (
     <div className='bg-blk text-wht min-h-screen flex flex-col'>

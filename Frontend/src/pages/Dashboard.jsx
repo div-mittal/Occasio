@@ -9,33 +9,40 @@ const Dashboard = () => {
   const [sEvent, setSEvent] = useState(null);
 
   useEffect(() => {
-    const role=localStorage.getItem('role');
-    if(!role){
-      navigate('/login');
+    const role = localStorage.getItem('role');
+    if (!role) {
+        navigate('/login');
+        return;
     }
+
     const fetchEvents = async () => {
-      try {
-        const role = localStorage.getItem('role');
-        const apiUrl = role === 'Attendee' 
-          ? "http://localhost:9002/api/v1/users/get-events" 
-          : "http://localhost:9002/api/v1/organizers/events";
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${document.cookie}`
-          },
-          credentials: 'include'
-        }); // replace with your actual API endpoint
-        const data = await response.json();
-        console.log(data)
-        // setEvents(data);
-      } catch (err) {
-        console.log(err);
-      }
+        try {
+            const apiUrl = role === 'Attendee'
+                ? "http://localhost:9002/api/v1/users/get-events"
+                : "http://localhost:9002/api/v1/organizers/events";
+
+            const response = await fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', 
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            // setEvents(data); // Update your state here
+        } catch (err) {
+            console.error('Error fetching events:', err);
+        }
     };
     fetchEvents();
-  }, []);
+}, []);
+
   return (
     <div className="h-[100vh] bg-blk flex flex-col">
       <Navbar />
