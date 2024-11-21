@@ -7,6 +7,8 @@ import { useParams } from "react-router-dom";
 const EventDetails = () => {
   const [user, setUser] = useState("Attendee"); // Example: Default set as "organizer" for testing
   const [event, setEvent] = useState(null);
+  const [editableEvent, setEditableEvent] = useState(null);
+  const [updateMessage, setUpdateMessage] = useState("");
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -22,19 +24,20 @@ const EventDetails = () => {
         );
         const data = await response.json();
         setEvent(data);
+        setEditableEvent(data); // Initialize editableEvent with fetched data
       } catch (error) {
         console.error("Error fetching event:", error);
       }
     };
     fetchEvent();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     console.log(event);
   }, [event]);
 
   const handleInputChange = (field, value) => {
-    setEditableEvent({ ...event, [field]: value });
+    setEditableEvent({ ...editableEvent, data: { ...editableEvent.data, [field]: value } });
   };
 
   const handleConfirm = () => {
@@ -46,6 +49,48 @@ const EventDetails = () => {
     // Implement the delete functionality
     console.log("Event deleted");
     navigate("/dashboard"); // Example: Redirecting to events list
+  };
+
+  const handleUpdateEvent = async () => {
+    try {
+      const response = await fetch(`http://localhost:9002/api/v1/events/update/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(editableEvent),
+      });
+      if (response.ok) {
+        const updatedEvent = await response.json();
+        setEvent(updatedEvent);
+        console.log("Event updated successfully");
+      } else {
+        console.error("Error updating event");
+      }
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
+  };
+
+  const handleSendUpdate = async () => {
+    try {
+      const response = await fetch(`http://localhost:9002/api/v1/events/send-mail/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ message: updateMessage }),
+      });
+      if (response.ok) {
+        console.log("Update message sent successfully");
+      } else {
+        console.error("Error sending update message");
+      }
+    } catch (error) {
+      console.error("Error sending update message:", error);
+    }
   };
 
   return (
@@ -70,23 +115,32 @@ const EventDetails = () => {
                         Send Update
                       </h1>
                       <div className="flex flex-row items-center gap-1 ">
-                        <textarea className="w-full rounded" />
-                        <button className="bg-ylw p-3 font-bold">send</button>
+                        <textarea
+                          className="w-full rounded"
+                          value={updateMessage}
+                          onChange={(e) => setUpdateMessage(e.target.value)}
+                        />
+                        <button
+                          className="bg-ylw p-3 font-bold"
+                          onClick={handleSendUpdate}
+                        >
+                          send
+                        </button>
                       </div>
                     </div>
                     <div className="flex h-full gap-1 pt-2">
                       <div className="w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
-                      <h1 className="text-2xl font-medium">Options</h1>
+                        <h1 className="text-2xl font-medium">Options</h1>
                       </div>
                       <div className="w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
                         <h1 className="text-2xl font-medium">Share Qr Code</h1>
                         {event.data.qrCode && (
-                        <img
-                          src={event.data.qrCode}
-                          alt="Event QR Code"
-                          className="w-full h-full object-scale-down rounded-lg"
-                        />
-                      )}
+                          <img
+                            src={event.data.qrCode}
+                            alt="Event QR Code"
+                            className="w-full h-full object-scale-down rounded-lg"
+                          />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -99,7 +153,7 @@ const EventDetails = () => {
                           </label>
                           <input
                             type="text"
-                            value={event.data.title}
+                            value={editableEvent.data.title}
                             onChange={(e) =>
                               handleInputChange("title", e.target.value)
                             }
@@ -112,9 +166,9 @@ const EventDetails = () => {
                           </label>
                           <input
                             type="text"
-                            value={event.data.city}
+                            value={editableEvent.data.city}
                             onChange={(e) =>
-                              handleInputChange("location", e.target.value)
+                              handleInputChange("city", e.target.value)
                             }
                             className="w-full p-2 border border-wht border-opacity-50 rounded-lg bg-blk text-wht"
                           />
@@ -126,7 +180,11 @@ const EventDetails = () => {
                             </label>
                             <input
                               type="date"
-                              value={new Date(event.data.date).toISOString().split('T')[0]}
+                              value={
+                                new Date(editableEvent.data.date)
+                                  .toISOString()
+                                  .split("T")[0]
+                              }
                               onChange={(e) =>
                                 handleInputChange("date", e.target.value)
                               }
@@ -139,7 +197,10 @@ const EventDetails = () => {
                             </label>
                             <input
                               type="time"
-                              value={new Date(event.data.date).toISOString().split('T')[1].substring(0, 5)}
+                              value={new Date(editableEvent.data.date)
+                                .toISOString()
+                                .split("T")[1]
+                                .substring(0, 5)}
                               onChange={(e) =>
                                 handleInputChange("time", e.target.value)
                               }
@@ -150,7 +211,7 @@ const EventDetails = () => {
                       </div>
                       <div className="flex flex-col">
                         <button
-                          onClick={handleDeleteEvent}
+                          onClick={handleUpdateEvent}
                           className="mt-4 px-6 py-2 bg-ylw text-blk font-bold rounded-lg"
                         >
                           Update Event
@@ -170,8 +231,8 @@ const EventDetails = () => {
               <div className="flex flex-row gap-8 h-full">
                 <div className="w-1/3">
                   <img
-                    src="/image.png"
-                    alt="event.title"
+                    src={event.data.coverImage.url}
+                    alt={event.data.coverImage.title}
                     className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
@@ -187,18 +248,21 @@ const EventDetails = () => {
                       About the Event
                     </h2>
                     <p className="text-wht border border-solid border-wht border-opacity-25 rounded-lg p-4 mt-2 h-24">
-                      {"Details about the event will appear here."}
+                      {event.data.description}
                     </p>
                   </div>
 
                   <div className="flex flex-row gap-8 mt-4">
                     <div className="flex flex-col items-center justify-center border border-solid border-wht border-opacity-25 rounded-lg p-4">
-                      <h3 className="text-wht text-2xl">{new Date(event.data.date).toLocaleDateString()}</h3>
-                      <p className="text-wht text-lg">Dec</p>
+                      <h3 className="text-wht text-2xl font-bold">
+                        {new Date(event.data.date).toLocaleDateString()}
+                      </h3>{" "}
                     </div>
 
                     <div className="flex flex-col items-center justify-center border border-solid border-wht border-opacity-25 rounded-lg p-4">
-                      <h3 className="text-wht text-2xl">{new Date(event.data.date).toLocaleTimeString()}</h3>
+                      <h3 className="text-wht text-2xl">
+                        {new Date(event.data.date).toLocaleTimeString()}
+                      </h3>
                       <p className="text-wht text-lg">onwards</p>
                     </div>
                   </div>
