@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import { useNavigate } from "react-router-dom";
 import RSVP from "../components/RSVP.jsx";
+import { useParams } from "react-router-dom";
 
 const EventDetails = ({ event }) => {
   const [user, setUser] = useState("Attendee"); // Example: Default set as "organizer" for testing
   const [editableEvent, setEditableEvent] = useState(event);
   const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
     const savedRole = localStorage.getItem("role");
@@ -35,7 +37,7 @@ const EventDetails = ({ event }) => {
       <Navbar />
       <div className="dash w-full px-20 py-12 flex-grow">
         <div className="relative flex flex-col w-full h-full p-8 border border-solid border-wht border-opacity-25 rounded-lg">
-          {user === "organizer" ? (
+          {user === "Organizer" ? (
             <>
               <div className="org-opt flex flex-col md:flex-row gap-8 h-full">
                 <div className="w-1/4">
@@ -67,7 +69,7 @@ const EventDetails = ({ event }) => {
                         </label>
                         <input
                           type="text"
-                          value={editableEvent.title}
+                          value="editableEvent.title"
                           onChange={(e) =>
                             handleInputChange("title", e.target.value)
                           }
@@ -80,7 +82,7 @@ const EventDetails = ({ event }) => {
                         </label>
                         <input
                           type="text"
-                          value={editableEvent.location}
+                          value="editableEvent.location"
                           onChange={(e) =>
                             handleInputChange("location", e.target.value)
                           }
@@ -94,7 +96,7 @@ const EventDetails = ({ event }) => {
                           </label>
                           <input
                             type="date"
-                            value={editableEvent.date}
+                            value="editableEvent.date"
                             onChange={(e) =>
                               handleInputChange("date", e.target.value)
                             }
@@ -107,7 +109,7 @@ const EventDetails = ({ event }) => {
                           </label>
                           <input
                             type="time"
-                            value={editableEvent.time}
+                            value="editableEvent.time"
                             onChange={(e) =>
                               handleInputChange("time", e.target.value)
                             }

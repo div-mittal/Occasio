@@ -9,39 +9,40 @@ const Dashboard = () => {
   const [sEvent, setSEvent] = useState(null);
 
   useEffect(() => {
-    const role = localStorage.getItem('role');
+    const role = localStorage.getItem("role");
     if (!role) {
-        navigate('/login');
-        return;
+      navigate("/login");
+      return;
     }
 
     const fetchEvents = async () => {
-        try {
-            const apiUrl = role === 'Attendee'
-                ? "http://localhost:9002/api/v1/users/get-events"
-                : "http://localhost:9002/api/v1/organizers/events";
+      try {
+        const apiUrl =
+          role === "Attendee"
+            ? "http://localhost:9002/api/v1/users/get-events"
+            : "http://localhost:9002/api/v1/organizers/events";
 
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include', 
-            });
+        const response = await fetch(apiUrl, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
 
-            if (!response.ok) {
-                throw new Error(`Error ${response.status}: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            setEvents(data.data.events)
-            // setEvents(data); // Update your state here
-        } catch (err) {
-            console.error('Error fetching events:', err);
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
+
+        const data = await response.json();
+        setEvents(data.data.events);
+        // setEvents(data); // Update your state here
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      }
     };
     fetchEvents();
-}, []);
+  }, []);
 
   return (
     <div className="h-[100vh] bg-blk flex flex-col">
@@ -49,24 +50,22 @@ const Dashboard = () => {
       <div className="dash w-full px-20 py-8 flex-grow">
         <div className="relative flex flex-col w-full h-full p-6 border border-solid border-wht border-opacity-25 rounded-lg">
           <h1 className="text-wht text-2xl">Dashboard</h1>
-          {sEvent == null ? (
+          {events != null ? (
             <div className="event-list flex flex-row flex-grow gap-4 py-4 overflow-auto minimal-scrollbar">
-              {/* {events.map((event) => (
-                                <Ecard 
-                                    key={event.id} 
-                                    event={event} 
-                                    onClick={() => setSEvent(event)} 
-                                />
-                            ))} */} 
-              <div className="hover:cursor-pointer w-1/5"
-                onClick={() => {
-                  console.log("Ecard clicked");
-                  navigate("/Event");
-                }}><Ecard/></div>
+              {events.map((event) => (
+                <Ecard
+                  key={event._id}
+                  id={event._id}
+                  title={event.title}
+                  date={event.date}
+                  cover={event.coverImage}
+                  location={event.city + ' , ' + event.state}
+                  onClick={() => setSEvent(event)}
+                />
+              ))}
             </div>
           ) : (
             <></>
-            // <AddEvent/>
           )}
           <div className="flex justify-center items-center h-12 w-12 bg-ylw rounded-md absolute bottom-16 right-12">
             <h1

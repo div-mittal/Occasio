@@ -2,8 +2,10 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { message } from "antd";
+import {useNavigate} from "react-router-dom";
 
 const Add = () => {
+    const navigate=useNavigate();
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [date, setDate] = useState("");
@@ -45,6 +47,9 @@ const Add = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log("Event registered successfully:", data);
+                message.success("Event registered successfully");
+                navigate("/dashboard");
+                
             } else {
                 console.error("Failed to register event:", response.statusText);
             }
