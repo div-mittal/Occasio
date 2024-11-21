@@ -34,7 +34,7 @@ const Dashboard = () => {
             }
 
             const data = await response.json();
-            console.log(data);
+            setEvents(data.data.events)
             // setEvents(data); // Update your state here
         } catch (err) {
             console.error('Error fetching events:', err);
