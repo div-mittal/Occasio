@@ -499,8 +499,6 @@ const getEvents = asyncHandler(async (req, res) => {
         }
     ]);
 
-    console.log(events[0].events);
-
     return res
         .status(200)
         .json(
