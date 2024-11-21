@@ -28,7 +28,6 @@ function Navbar({ page }) {
     }
     }else{
         buttonText = 'Logout';
-        localStorage.clear();
         navigateTo = './';
     }
 

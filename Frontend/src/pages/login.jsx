@@ -27,6 +27,7 @@ const Login = () => {
         return;
       }
       const data = await response.json();
+      console.log(data);
         document.cookie.split(";").forEach((c) => {
           document.cookie = c
             .replace(/^ +/, "")
@@ -34,8 +35,8 @@ const Login = () => {
         });
         document.cookie = data.data.accessToken;
         localStorage.setItem('role', role);
-        localStorage.setItem('user', JSON.stringify(data.data));
-      navigate('/dashboard');
+        localStorage.setItem('username', username);
+        navigate('/dashboard');
     } catch (error) {
       console.error('Error logging in:', error);
     }
