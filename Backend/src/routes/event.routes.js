@@ -88,7 +88,6 @@ router.route("/update-rsvp/:eventID").put(
 );
 
 router.route("/open").get(
-    verifyJWT(User),
     getAllOpenEvents
 );
 

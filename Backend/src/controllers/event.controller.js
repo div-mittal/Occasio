@@ -714,11 +714,72 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
 
 const getAllOpenEvents = asyncHandler(async (req, res) => {
     const currentDate = new Date();
-    const events = await Event.find({ type: "open", registrationsEnabled: true, deadline: { $gt: currentDate } });
     
-    if (!events.length) {
-        throw new ApiError(404, "No open events found");
-    }
+    const events = await Event.aggregate([
+        {
+            $match: { type: "open", registrationsEnabled: true, deadline: { $gt: currentDate } }  
+        },
+        {
+            $lookup: {
+                from: "images",
+                localField: "image",
+                foreignField: "_id",
+                as: "image",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0,
+                            __v: 0,
+                            folderName: 0,
+                            createdAt: 0,
+                            updatedAt: 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: "images",
+                localField: "coverImage",
+                foreignField: "_id",
+                as: "coverImage",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0,
+                            __v: 0,
+                            folderName: 0,
+                            createdAt: 0,
+                            updatedAt: 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                image: { $arrayElemAt: ["$image", 0] },
+                coverImage: { $arrayElemAt: ["$coverImage", 0] }
+            }
+        },
+        {
+            $project: {
+                __v: 0,
+                gallery: 0,
+                createdBy: 0,
+                attendees: 0,
+                type: 0,
+                capacity: 0,
+                remainingCapacity: 0,
+                qrCode: 0,
+                registrationsEnabled: 0,
+                deadline: 0,
+                createdAt: 0,
+                updatedAt: 0,
+            }
+        }
+    ])
 
     return res
         .status(200)

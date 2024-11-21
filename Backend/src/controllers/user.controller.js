@@ -274,6 +274,12 @@ const getAttendedEvents = asyncHandler(async (req, res, next) => {
                         }
                     },
                     {
+                        $addFields: {
+                            image: { $arrayElemAt: ["$image", 0] },
+                            coverImage: { $arrayElemAt: ["$coverImage", 0] }
+                        },
+                    },
+                    {
                         $project: {
                             __v: 0,
                             gallery: 0,
@@ -297,15 +303,13 @@ const getAttendedEvents = asyncHandler(async (req, res, next) => {
         }
     ]);
 
-    // const user = await User.findById(req.user._id).populate("eventHistory");
-
     if (!user || user.length === 0) {
         throw new ApiError(404, "User not found");
     }
 
     return res
         .status(200).json(
-            new ApiResponse(200, user, "Attended events fetched successfully")
+            new ApiResponse(200, user[0], "Attended events fetched successfully")
         );
 })
 
