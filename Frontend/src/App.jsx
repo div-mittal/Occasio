@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Signup from "./pages/Signup.jsx";
 import Add from "./pages/Add.jsx";
 import Event from "./pages/Event.jsx"
+import Scan from "./pages/Scan.jsx";
 function App() {
   return (
     <>
@@ -19,6 +20,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard/>} />
         <Route path='/add' element={<Add/>} />
         <Route path='/event/:id' element={<Event />} />
+        <Route path='/scan' element={<Scan />} />
       </Routes>
     </>
   );
