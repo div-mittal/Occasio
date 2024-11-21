@@ -51,6 +51,9 @@ const Add = () => {
                 navigate("/dashboard");
                 
             } else {
+                const data = await response.json();
+                console.log(data)
+                message.error(data.message);
                 console.error("Failed to register event:", response.statusText);
             }
         } catch (error) {

@@ -703,9 +703,50 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
     participant.rsvpStatus = "checked-in"
     await participant.save({ validateBeforeSave: false })
 
+    const participantWithName = await Participant.aggregate([
+        {
+            $match: { _id: new mongoose.Types.ObjectId(qrCode) }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "user",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0,
+                            __v: 0,
+                            password: 0,
+                            createdAt: 0,
+                            updatedAt: 0,
+                            folderName: 0,
+                            refreshToken: 0,
+                            verified: 0,
+                            eventHistory: 0
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: "$user"
+        },
+        {
+            $project: {
+                __v: 0,
+                event: 0,
+                qrCode: 0,
+                createdAt: 0,
+                updatedAt: 0
+            }
+        }
+    ])
+
     return res
         .status(200)
-        .json(new ApiResponse(200, participant, "Participant verified successfully"))
+        .json(new ApiResponse(200, participantWithName, "Participant verified successfully"))
 })
 
 const getAllOpenEvents = asyncHandler(async (req, res) => {

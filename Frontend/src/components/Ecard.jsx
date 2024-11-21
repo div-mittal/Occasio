@@ -5,7 +5,6 @@ const Ecard = (props) => {
     const date=new Date(props.date);
     const day=date.getDate();
     const month=date.toLocaleString('default', { month: 'short' });
-    console.log(props.cover.url);
 
     const handleClick = () => {
         console.log(props.id);
