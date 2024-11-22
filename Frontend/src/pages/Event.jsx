@@ -112,7 +112,10 @@ const EventDetails = () => {
         console.log(updatedEvent.data);
         setEvent(updatedEvent.data);
         console.log("Event updated successfully");
+        message.success("Event updated successfully");
       } else {
+        const data = await response.json();
+        message.error(data.message);
         console.error("Error updating event");
       }
     } catch (error) {
@@ -181,11 +184,11 @@ const EventDetails = () => {
                         </button>
                       </div>
                     </div>
-                    <div className="flex h-full gap-1 pt-2 justify-center">
+                    <div className="flex flex-col items-center h-full gap-1 pt-2 justify-center">
                       {/* <div className="w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
                         <h1 className="text-2xl font-medium">Options</h1>
                       </div> */}
-                      <div className="flex flex-col w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
+                      <div className="flex flex-col w-1/2  p-2 py-1 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
                         <h1 className="text-2xl font-medium">Share QR Code</h1>
                         {event.qrCode && (
                           <img
@@ -216,6 +219,10 @@ const EventDetails = () => {
                           Copy Link
                         </button>
                       </div>
+                      </div>
+                      <div className="flex text-wht justify-between gap-[22rem]">
+                        <p className="font-semibold text-lg">Participants: {event.attendees.length}</p>
+                        <p className="font-semibold text-lg">Remaining: {event.remainingCapacity}</p>
                       </div>
                     </div>
                   </div>
@@ -289,6 +296,20 @@ const EventDetails = () => {
                               className="w-full p-2 border border-wht border-opacity-50 rounded-lg bg-blk text-wht"
                             />
                           </div>
+                          
+                        </div>
+                        <div>
+                          <label className="text-wht text-lg font-semibold">
+                            Capacity:
+                          </label>
+                          <input
+                            type="number"
+                            value={editableEvent.capacity}
+                            onChange={(e) =>
+                              handleInputChange("capacity", e.target.value)
+                            }
+                            className="w-full p-2 border border-wht border-opacity-50 rounded-lg bg-blk text-wht"
+                          />
                         </div>
                       </div>
                       <div className="flex flex-col">
