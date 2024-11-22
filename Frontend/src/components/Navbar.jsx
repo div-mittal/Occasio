@@ -68,7 +68,7 @@ function Navbar({ page }) {
         <>
             <div className="sticky top-0 m-0 text-wht w-screen h-[8vh] flex flex-row items-center py-12 px-20 justify-between">
                 <div className="m-0 gap-32 flex flex-row items-center justify-between">
-                    <img className="h-[3.5vh]" src="OCCASIO.png" alt="Occasio Logo" />
+                    <img className="h-[3.5vh]" src="/OCCASIO.png" alt="Occasio Logo" />
 
                     {/* Desktop Navigation Links */}
                     <div className="hidden lg:flex gap-12 text-wht text-lg flex-row items-center justify-between">
