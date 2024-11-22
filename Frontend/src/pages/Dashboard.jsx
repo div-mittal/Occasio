@@ -24,13 +24,18 @@ const Dashboard = () => {
           },
           credentials: "include",
         });
-
+        
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
 
         const data = await response.json();
-        setEvents(data.data.events);
+        console.log(data)
+        {
+          role === "Attendee"
+            ? setEvents(data.data.attendedEvents)
+            : setEvents(data.data.events);
+        }
         // setEvents(data); // Update your state here
       } catch (err) {
         console.error("Error fetching events:", err);
