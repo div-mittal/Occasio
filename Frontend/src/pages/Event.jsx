@@ -150,10 +150,10 @@ const EventDetails = () => {
   };
 
   return (
-    <div className="h-[100vh] bg-blk flex flex-col">
-      <Navbar />
+    <div className=" bg-blk flex flex-col">
+      <Navbar/>
       <div className="dash w-full px-20 py-4 flex-grow ">
-        <div className="relative flex flex-col w-full h-full p-8 border border-solid border-wht border-opacity-25 rounded-lg">
+        <div className="relative flex flex-col w-full h-full p-8  border-solid border-wht border-opacity-25 rounded-lg">
           {event ? ( // Check if event is loaded
             user === "Organizer" ? (
               <>
