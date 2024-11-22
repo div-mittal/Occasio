@@ -149,7 +149,7 @@ const EventDetails = () => {
   return (
     <div className="h-[100vh] bg-blk flex flex-col">
       <Navbar />
-      <div className="dash w-full px-20 py-12 flex-grow">
+      <div className="dash w-full px-20 py-4 flex-grow ">
         <div className="relative flex flex-col w-full h-full p-8 border border-solid border-wht border-opacity-25 rounded-lg">
           {event ? ( // Check if event is loaded
             user === "Organizer" ? (
@@ -185,7 +185,7 @@ const EventDetails = () => {
                       {/* <div className="w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
                         <h1 className="text-2xl font-medium">Options</h1>
                       </div> */}
-                      <div className="w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
+                      <div className="flex flex-col w-1/2 p-2 border border-solid border-wht border-opacity-25 rounded-lg text-wht">
                         <h1 className="text-2xl font-medium">Share QR Code</h1>
                         {event.qrCode && (
                           <img
@@ -194,6 +194,28 @@ const EventDetails = () => {
                             className="w-full h-full object-scale-down rounded-lg"
                           />
                         )}
+                        <div className="flex justify-between mt-2 gap-2 p-2">
+                        <button
+                          className="bg-ylw w-1/2 p-2 font-bold rounded-lg text-blk"
+                          onClick={() => {
+                            const link = document.createElement("a");
+                            link.href = event.qrCode;
+                            link.download = "event-qr-code.png";
+                            link.click();
+                          }}
+                        >
+                          Download QR
+                        </button>
+                        <button
+                          className="bg-ylw w-1/2 p-2 font-bold rounded-lg text-blk"
+                          onClick={() => {
+                            navigator.clipboard.writeText(window.location.href);
+                            message.success("QR Code URL copied to clipboard");
+                          }}
+                        >
+                          Copy Link
+                        </button>
+                      </div>
                       </div>
                     </div>
                   </div>

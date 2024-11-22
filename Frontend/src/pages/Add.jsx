@@ -153,7 +153,7 @@ const Add = () => {
                                             Select Event Type
                                         </option>
                                         <option value="open">Open</option>
-                                        <option value="private">Private</option>
+                                        <option value="invite-only">invite-only</option>
                                     </select>
                                 </div>
                                 <div className="w-full md:w-1/3 px-2">

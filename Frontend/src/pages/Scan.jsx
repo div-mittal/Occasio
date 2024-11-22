@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import QrScanner from 'react-qr-scanner';
 import { useNavigate } from 'react-router';
 import { useParams } from 'react-router-dom';
+import { message } from 'antd';
 
 const Scan = () => {
     const { id } = useParams();
@@ -29,7 +30,10 @@ const Scan = () => {
                 });
                 const data = await response.json();
                 setData(data.message);
-                console.log(data.message);
+                if(data.statusCode == 200) {
+                    setData("Thank you for Checking in " + data.data.user.name);
+                    message.success( data.data.user.name + " checked in successfully");
+                };
                 setScannerKey(Date.now()); // Reset the scanner
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -54,13 +58,13 @@ const Scan = () => {
             <div className="bg-ylw p-2 rounded-lg">
                 <QrScanner
                     key={scannerKey}
-                    delay={300}
+                    delay={1000}
                     onError={handleError}
                     onScan={handleScan}
                     style={previewStyle}
                 />
             </div>
-            <p className="text-white mt-4">{data}</p>
+            <p className="text-white font-medium text-2xl mt-4">{data}</p>
         </div>
     );
 };

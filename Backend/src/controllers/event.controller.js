@@ -754,7 +754,7 @@ const verifyRSVPUsingQRCode = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200, participantWithName, "Participant verified successfully"))
+        .json(new ApiResponse(200, participantWithName[0], "Participant verified successfully"))
 })
 
 const getAllOpenEvents = asyncHandler(async (req, res) => {
@@ -910,3 +910,5 @@ export {
     getAllOpenEvents,
     sendMailToParticipants
 }
+
+//TODO: delete event
