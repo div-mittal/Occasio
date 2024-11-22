@@ -216,6 +216,8 @@ const updateEvent = asyncHandler(async (req, res) => {
             throw new ApiError(401, "Unauthorized");
         }
 
+        console.log(req.body)
+
         const { title, description, date, location, state, city, type, capacity } = req.body;
 
         if ([title, description, date, location, state, city, type, capacity].some(field => !field)) {
@@ -224,6 +226,10 @@ const updateEvent = asyncHandler(async (req, res) => {
 
         if (Number(capacity) <= 0) {
             throw new ApiError(400, "Capacity should be greater than 0");
+        }
+
+        if(Number(capacity) < event.attendees.length){
+            throw new ApiError(400, "Capacity can not be less than the number of attendees already registered");
         }
 
         if (isNaN(new Date(date))) {
@@ -245,6 +251,8 @@ const updateEvent = asyncHandler(async (req, res) => {
         if (remainingCapacity < 0) {
             throw new ApiError(400, "Remaining capacity cannot be negative");
         }
+
+        console.log("here")
 
         const updatedEvent = await Event.findByIdAndUpdate(
             eventid,
