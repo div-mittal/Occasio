@@ -20,8 +20,8 @@ const Login = () => {
     try {
       const url =
         role === "Attendee"
-          ? "http://localhost:9002/api/v1/users/login"
-          : "http://localhost:9002/api/v1/organizers/login";
+          ? "http://15.207.134.38/api/v1/users/login"
+          : "http://15.207.134.38/api/v1/organizers/login";
 
       const response = await fetch(url, {
         method: 'POST',

@@ -15,7 +15,7 @@ const RSVP = (props) => {
       setLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:9002/api/v1/events/check/${props.eventid}`,
+          `http://15.207.134.38/api/v1/events/check/${props.eventid}`,
           {
             method: "GET",
             headers: {

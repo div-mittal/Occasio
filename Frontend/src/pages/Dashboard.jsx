@@ -14,8 +14,8 @@ const Dashboard = () => {
       try {
         const apiUrl =
           role === "Attendee"
-            ? "http://localhost:9002/api/v1/users/get-events"
-            : "http://localhost:9002/api/v1/organizers/events";
+            ? "http://15.207.134.38/api/v1/users/get-events"
+            : "http://15.207.134.38/api/v1/organizers/events";
 
         const response = await fetch(apiUrl, {
           method: "GET",

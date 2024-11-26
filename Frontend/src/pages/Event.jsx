@@ -73,7 +73,7 @@ const EventDetails = () => {
   const handleDeleteEvent = async () => {
     try {
       const response = await fetch(
-        `http://localhost:9002/api/v1/events/delete/${id}`,
+        `http://15.207.134.38/api/v1/events/delete/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -96,7 +96,7 @@ const EventDetails = () => {
   const handleUpdateEvent = async () => {
     try {
       const response = await fetch(
-        `http://localhost:9002/api/v1/events/update/${id}`,
+        `http://15.207.134.38/api/v1/events/update/${id}`,
         {
           method: "POST",
           headers: {
@@ -126,7 +126,7 @@ const EventDetails = () => {
   const handleSendUpdate = async () => {
     try {
       const response = await fetch(
-        `http://localhost:9002/api/v1/events/send-mail/${id}`,
+        `http://15.207.134.38/api/v1/events/send-mail/${id}`,
         {
           method: "POST",
           headers: {

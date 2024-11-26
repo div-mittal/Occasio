@@ -34,8 +34,8 @@ const Signup = () => {
 
     const url =
       role === "Attendee"
-        ? "http://localhost:9002/api/v1/users/register"
-        : "http://localhost:9002/api/v1/organizers/register";
+        ? "http://15.207.134.38/api/v1/users/register"
+        : "http://15.207.134.38/api/v1/organizers/register";
 
     fetch(url, {
       method: "POST",

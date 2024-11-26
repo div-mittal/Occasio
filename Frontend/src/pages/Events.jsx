@@ -8,7 +8,7 @@ const Events = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await fetch('http://localhost:9002/api/v1/events/open', {
+                const response = await fetch('http://15.207.134.38/api/v1/events/open', {
                     method: 'GET',
                     credentials: 'include'
                 });

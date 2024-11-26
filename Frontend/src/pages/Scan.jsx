@@ -20,7 +20,7 @@ const Scan = () => {
     const handleScan = async (result) => {
         if (result) {
             try {
-                const response = await fetch(`http://localhost:9002/api/v1/events/verify-rsvp/${eventId}`, {
+                const response = await fetch(`http://15.207.134.38/api/v1/events/verify-rsvp/${eventId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

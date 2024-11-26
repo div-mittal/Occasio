@@ -36,7 +36,7 @@ const Add = () => {
         console.log(formData)
         try {
             const response = await fetch(
-                "http://localhost:9002/api/v1/events/create",
+                "http://15.207.134.38/api/v1/events/create",
                 {
                     method: "POST",
                     body: formData,
